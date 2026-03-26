@@ -242,7 +242,6 @@
     let appsBuoni = JSON.parse(localStorage.getItem('appsBuoni')) || [];
     let storicoSpese = JSON.parse(localStorage.getItem('storicoSpese')) || {};
 
-    // Funzione per notifiche silenziose
     function showToast(message) {
       const toast = document.createElement('div');
       toast.className = 'toast';
@@ -251,7 +250,6 @@
       setTimeout(() => toast.remove(), 2000);
     }
 
-    // NAVIGAZIONE
     function vaiA(pagina) {
       document.querySelectorAll('.pagina').forEach(p => p.classList.remove('attiva'));
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('attivo'));
@@ -269,7 +267,6 @@
       modalitaCorrente = null;
     }
 
-    // MODALE BARCODE
     function mostraModale(nome, codice) {
       document.getElementById('modale-nome').textContent = nome;
       document.getElementById('modale-codice').textContent = codice;
@@ -281,55 +278,36 @@
       document.getElementById('modale').classList.remove('aperta');
     }
 
-    // GESTIONE FOTOCAMERA
     async function avviaFotocamera(modalita) {
       stopTutteFotocamere();
-      
       const containerId = `scanner-container-${modalita}`;
       const readerId = `reader-${modalita}`;
       const container = document.getElementById(containerId);
-      
-      if (!container) {
-        showToast('Errore: componente non trovato');
-        return;
-      }
-
+      if (!container) { showToast('Errore'); return; }
       try {
         container.style.display = 'block';
         modalitaCorrente = modalita;
-        
         const html5QrCode = new Html5Qrcode(readerId);
         scannerAttivo = html5QrCode;
-        
         const config = { fps: 10, qrbox: { width: 250, height: 150 }, aspectRatio: 1.0 };
-        
-        await html5QrCode.start(
-          { facingMode: "environment" },
-          config,
-          (decodedText) => {
-            if (modalitaCorrente === modalita) {
-              if (modalita === 'spesa') {
-                document.getElementById('campo-barcode').value = decodedText;
-                stopTutteFotocamere();
-                cercaBarcode();
-              } else if (modalita === 'carte') {
-                document.getElementById('carta-codice').value = decodedText;
-                stopTutteFotocamere();
-                showToast('✓ Codice acquisito');
-              } else if (modalita === 'buoni') {
-                document.getElementById('buono-codice').value = decodedText;
-                stopTutteFotocamere();
-                showToast('✓ Codice acquisito');
-              }
+        await html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
+          if (modalitaCorrente === modalita) {
+            if (modalita === 'spesa') {
+              document.getElementById('campo-barcode').value = decodedText;
+              stopTutteFotocamere();
+              cercaBarcode();
+            } else if (modalita === 'carte') {
+              document.getElementById('carta-codice').value = decodedText;
+              stopTutteFotocamere();
+              showToast('✓ Codice acquisito');
+            } else if (modalita === 'buoni') {
+              document.getElementById('buono-codice').value = decodedText;
+              stopTutteFotocamere();
+              showToast('✓ Codice acquisito');
             }
-          },
-          (error) => {}
-        );
-        
-      } catch (err) {
-        showToast('Impossibile accedere alla fotocamera');
-        container.style.display = 'none';
-      }
+          }
+        }, (error) => {});
+      } catch (err) { showToast('Impossibile accedere alla fotocamera'); container.style.display = 'none'; }
     }
 
     function stopFotocamera(modalita) {
@@ -342,7 +320,6 @@
       if (modalitaCorrente === modalita) modalitaCorrente = null;
     }
 
-    // OPEN FOOD FACTS
     async function cercaBarcode() {
       const input = document.getElementById('campo-barcode');
       const codice = input.value.trim();
@@ -372,7 +349,6 @@
       }
     }
 
-    // LISTA SPESA
     function aggiungiProdotto() {
       const nome = document.getElementById('campo-input').value.trim();
       if (!nome) return;
@@ -456,7 +432,6 @@
       });
     }
 
-    // CARTE FEDELTÀ
     function salvaCarta() {
       const nome = document.getElementById('carta-nome').value.trim();
       const codice = document.getElementById('carta-codice').value.trim();
@@ -496,7 +471,7 @@
       `).join('');
     }
 
-    // APP BUONI - CON SALDO INIZIALE E REGISTRO SPESE
+    // FUNZIONI APP BUONI - CORRETTE
     function salvaAppBuono() {
       const select = document.getElementById('app-seleziona');
       let nomeApp = select.value;
@@ -540,6 +515,7 @@
       appsBuoni.push(nuovaApp);
       localStorage.setItem('appsBuoni', JSON.stringify(appsBuoni));
       
+      // Pulisci i campi del form
       document.getElementById('app-seleziona').value = '';
       document.getElementById('app-nome-personalizzato').value = '';
       document.getElementById('app-username').value = '';
@@ -547,8 +523,10 @@
       document.getElementById('app-link').value = '';
       document.getElementById('app-nome-personalizzato').style.display = 'none';
       
+      // RICARICA LA LISTA DELLE APP
       renderAppsBuoni();
-      showToast(`✓ App ${nomeApp} salvata`);
+      
+      showToast(`✓ App ${nomeApp} salvata!`);
     }
     
     function getDecodedPassword(encoded) {
@@ -593,12 +571,12 @@
         app.saldoResiduo -= spesa;
         app.speseTotali += spesa;
         
-        // Salva nello storico
         if (!storicoSpese[id]) storicoSpese[id] = [];
+        const descrizione = prompt('Descrizione (opzionale):', 'Acquisto') || 'Acquisto';
         storicoSpese[id].push({
           data: new Date().toLocaleString(),
           importo: spesa,
-          descrizione: prompt('Descrizione (opzionale):', 'Acquisto') || 'Acquisto'
+          descrizione: descrizione
         });
         localStorage.setItem('storicoSpese', JSON.stringify(storicoSpese));
         localStorage.setItem('appsBuoni', JSON.stringify(appsBuoni));
@@ -701,7 +679,6 @@
       `}).join('');
     }
 
-    // BUONI FISICI
     function salvaBuono() {
       const nome = document.getElementById('buono-nome').value.trim();
       const codice = document.getElementById('buono-codice').value.trim();
@@ -741,7 +718,6 @@
       `).join('');
     }
 
-    // Seleziona app personalizzata
     document.getElementById('app-seleziona')?.addEventListener('change', function() {
       const personalizzato = document.getElementById('app-nome-personalizzato');
       personalizzato.style.display = this.value === 'Altra' ? 'block' : 'none';
@@ -749,16 +725,13 @@
       document.getElementById('app-link').value = opt.getAttribute('data-link') || '';
     });
 
-    // EVENTI KEYBOARD
     document.getElementById('campo-input')?.addEventListener('keydown', e => e.key === 'Enter' && aggiungiProdotto());
     document.getElementById('campo-barcode')?.addEventListener('keydown', e => e.key === 'Enter' && cercaBarcode());
 
-    // SERVICE WORKER
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error:', err));
     }
 
-    // ESPONI FUNZIONI GLOBALI
     window.avviaFotocamera = avviaFotocamera;
     window.stopFotocamera = stopFotocamera;
     window.cercaBarcode = cercaBarcode;
@@ -784,7 +757,6 @@
     window.chiudiModale = chiudiModale;
     window.vaiA = vaiA;
 
-    // INIT
     renderLista();
     aggiornaContatori();
     renderCarte();
