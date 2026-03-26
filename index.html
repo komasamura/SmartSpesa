@@ -13,6 +13,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   
   <style>
     * {
@@ -114,77 +115,25 @@
     }
     .risultato-barcode.errore { color: #C33C2C; }
 
-    /* STILE PER LA FOTOCAMERA CON MIRINO */
     .scanner-container {
-      position: relative;
       margin-top: 16px;
-      background: #000;
-      border-radius: 20px;
-      overflow: hidden;
+      position: relative;
       display: none;
     }
     .scanner-container video {
       width: 100%;
-      display: block;
-      transform: scaleX(1);
-    }
-    .scan-line {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 3px;
-      background: #ff0000;
-      box-shadow: 0 0 8px #ff0000;
-      animation: scan 2s linear infinite;
-      pointer-events: none;
-    }
-    @keyframes scan {
-      0% { top: 0%; }
-      100% { top: 100%; }
-    }
-    .scanner-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: 2px solid rgba(255, 0, 0, 0.6);
       border-radius: 20px;
-      box-shadow: inset 0 0 0 9999px rgba(0, 0, 0, 0.3);
-      pointer-events: none;
-    }
-    .scanner-corners {
-      position: absolute;
-      top: 20%;
-      left: 10%;
-      width: 80%;
-      height: 60%;
-      border: 2px solid #ff0000;
-      border-radius: 12px;
-      box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
-      pointer-events: none;
-    }
-    .scanner-corners::before,
-    .scanner-corners::after,
-    .scanner-corners span::before,
-    .scanner-corners span::after {
-      content: '';
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      border: 3px solid #ff0000;
     }
     .btn-stop {
-      background: rgba(0,0,0,0.7);
-      border: none;
+      background: #E63946;
       color: white;
+      border: none;
       padding: 10px;
-      font-size: 0.8rem;
+      border-radius: 40px;
+      margin-top: 10px;
       width: 100%;
       cursor: pointer;
-      position: relative;
-      z-index: 10;
+      font-weight: bold;
     }
 
     .form-aggiunta {
@@ -524,9 +473,7 @@
       </div>
       <div id="risultato-barcode" class="risultato-barcode"></div>
       <div id="scanner-container-spesa" class="scanner-container">
-        <video id="video-spesa" autoplay playsinline muted></video>
-        <div class="scanner-corners"></div>
-        <div class="scan-line"></div>
+        <div id="reader-spesa"></div>
         <button class="btn-stop" onclick="stopFotocamera('spesa')">✕ Chiudi fotocamera</button>
       </div>
     </div>
@@ -566,9 +513,7 @@
           <button class="btn-fotocamera" onclick="avviaFotocamera('carte')">📷 Scansiona</button>
         </div>
         <div id="scanner-container-carte" class="scanner-container">
-          <video id="video-carte" autoplay playsinline muted></video>
-          <div class="scanner-corners"></div>
-          <div class="scan-line"></div>
+          <div id="reader-carte"></div>
           <button class="btn-stop" onclick="stopFotocamera('carte')">✕ Chiudi</button>
         </div>
         <button class="btn-salva" onclick="salvaCarta()">Salva carta</button>
@@ -614,9 +559,7 @@
           <button class="btn-fotocamera" onclick="avviaFotocamera('buoni')">📷 Scansiona</button>
         </div>
         <div id="scanner-container-buoni" class="scanner-container">
-          <video id="video-buoni" autoplay playsinline muted></video>
-          <div class="scanner-corners"></div>
-          <div class="scan-line"></div>
+          <div id="reader-buoni"></div>
           <button class="btn-stop" onclick="stopFotocamera('buoni')">✕ Chiudi</button>
         </div>
         <button class="btn-salva" onclick="salvaBuono()">Salva buono</button>
@@ -646,9 +589,8 @@
     // DATI
     let prodotti = [];
     let filtroAttivo = 'tutti';
-    let modalitaScansione = null;
-    let scannerCorrente = null;
-    let streamCorrente = null;
+    let scannerAttivo = null;
+    let modalitaCorrente = null;
 
     let carte = JSON.parse(localStorage.getItem('carte')) || [];
     let buoni = JSON.parse(localStorage.getItem('buoni')) || [];
@@ -664,9 +606,12 @@
     }
     
     function stopTutteFotocamere() {
-      stopFotocamera('spesa');
-      stopFotocamera('carte');
-      stopFotocamera('buoni');
+      if (scannerAttivo) {
+        scannerAttivo.stop().catch(e => console.log(e));
+        scannerAttivo = null;
+      }
+      document.querySelectorAll('.scanner-container').forEach(c => c.style.display = 'none');
+      modalitaCorrente = null;
     }
 
     // MODALE BARCODE
@@ -681,73 +626,56 @@
       document.getElementById('modale').classList.remove('aperta');
     }
 
-    // GESTIONE FOTOCAMERA DEFINITIVA CON MIRINO
+    // GESTIONE FOTOCAMERA CON HTML5-QRCODE
     async function avviaFotocamera(modalita) {
-      stopFotocamera(modalita);
+      stopTutteFotocamere();
       
       const containerId = `scanner-container-${modalita}`;
-      const videoId = `video-${modalita}`;
+      const readerId = `reader-${modalita}`;
       const container = document.getElementById(containerId);
-      const videoElem = document.getElementById(videoId);
-
-      if (!container || !videoElem) {
-        alert('Errore: componente fotocamera non trovato');
+      
+      if (!container) {
+        alert('Errore: componente non trovato');
         return;
       }
 
       try {
         container.style.display = 'block';
-        modalitaScansione = modalita;
+        modalitaCorrente = modalita;
         
-        // Richiedi accesso alla fotocamera posteriore (senza specchio)
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-          video: { facingMode: { exact: "environment" } } 
-        });
+        const html5QrCode = new Html5Qrcode(readerId);
+        scannerAttivo = html5QrCode;
         
-        streamCorrente = stream;
-        videoElem.srcObject = stream;
-        videoElem.style.transform = 'scaleX(1)';
-        await videoElem.play();
+        const config = {
+          fps: 10,
+          qrbox: { width: 250, height: 150 },
+          aspectRatio: 1.0
+        };
         
-        // Carica ZXing
-        const script = document.createElement('script');
-        script.src = 'https://unpkg.com/@zxing/library@0.18.6/umd/index.js';
-        
-        script.onload = () => {
-          try {
-            const codeReader = new ZXing.BrowserMultiFormatReader();
-            scannerCorrente = codeReader;
-            
-            codeReader.decodeFromVideoElement(videoElem, (result, err) => {
-              if (result && modalitaScansione === modalita) {
-                const codiceLetto = result.text;
-                
-                if (modalita === 'spesa') {
-                  document.getElementById('campo-barcode').value = codiceLetto;
-                  stopFotocamera('spesa');
-                  cercaBarcode();
-                } else if (modalita === 'carte') {
-                  document.getElementById('carta-codice').value = codiceLetto;
-                  stopFotocamera('carte');
-                  alert('✅ Codice acquisito: ' + codiceLetto);
-                } else if (modalita === 'buoni') {
-                  document.getElementById('buono-codice').value = codiceLetto;
-                  stopFotocamera('buoni');
-                  alert('✅ Codice acquisito: ' + codiceLetto);
-                }
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          config,
+          (decodedText) => {
+            if (modalitaCorrente === modalita) {
+              if (modalita === 'spesa') {
+                document.getElementById('campo-barcode').value = decodedText;
+                stopTutteFotocamere();
+                cercaBarcode();
+              } else if (modalita === 'carte') {
+                document.getElementById('carta-codice').value = decodedText;
+                stopTutteFotocamere();
+                alert('✅ Codice acquisito: ' + decodedText);
+              } else if (modalita === 'buoni') {
+                document.getElementById('buono-codice').value = decodedText;
+                stopTutteFotocamere();
+                alert('✅ Codice acquisito: ' + decodedText);
               }
-            });
-          } catch(e) {
-            console.error('Errore scanner:', e);
+            }
+          },
+          (error) => {
+            console.log('Errore scansione:', error);
           }
-        };
-        
-        script.onerror = () => {
-          alert('Errore nel caricamento della libreria. Verifica la connessione internet.');
-          container.style.display = 'none';
-        };
-        
-        document.head.appendChild(script);
+        );
         
       } catch (err) {
         console.error('Errore fotocamera:', err);
@@ -757,30 +685,13 @@
     }
 
     function stopFotocamera(modalita) {
-      const containerId = `scanner-container-${modalita}`;
-      const videoId = `video-${modalita}`;
-      const container = document.getElementById(containerId);
-      const videoElem = document.getElementById(videoId);
-      
-      if (scannerCorrente) {
-        try {
-          scannerCorrente.reset();
-          scannerCorrente = null;
-        } catch(e) {}
+      if (scannerAttivo && modalitaCorrente === modalita) {
+        scannerAttivo.stop().catch(e => console.log(e));
+        scannerAttivo = null;
       }
-      
-      if (streamCorrente) {
-        streamCorrente.getTracks().forEach(track => track.stop());
-        streamCorrente = null;
-      }
-      
-      if (videoElem && videoElem.srcObject) {
-        videoElem.srcObject.getTracks().forEach(track => track.stop());
-        videoElem.srcObject = null;
-      }
-      
+      const container = document.getElementById(`scanner-container-${modalita}`);
       if (container) container.style.display = 'none';
-      if (modalitaScansione === modalita) modalitaScansione = null;
+      if (modalitaCorrente === modalita) modalitaCorrente = null;
     }
 
     // OPEN FOOD FACTS
