@@ -471,13 +471,13 @@
     <div class="sezione">
       <h2>📷 Cerca per barcode</h2>
       <div class="form-barcode">
-        <input type="number" id="campo-barcode" placeholder="Codice a barre...">
+        <input type="text" id="campo-barcode" placeholder="Codice a barre...">
         <button class="btn-cerca" onclick="cercaBarcode()">Cerca</button>
         <button class="btn-fotocamera" onclick="avviaFotocamera('spesa')">📷</button>
       </div>
       <div id="risultato-barcode" class="risultato-barcode"></div>
       <div id="video-container">
-        <video id="video-spesa" autoplay playsinline></video>
+        <video id="video-spesa" autoplay playsinline muted></video>
         <button class="btn-stop" onclick="stopFotocamera('spesa')">✕ Chiudi fotocamera</button>
       </div>
     </div>
@@ -513,11 +513,11 @@
       <div class="form-carta">
         <input type="text" id="carta-nome" placeholder="Nome carta (es. Esselunga)">
         <div class="form-barcode" style="margin-bottom:0">
-          <input type="number" id="carta-codice" placeholder="Codice a barre...">
+          <input type="text" id="carta-codice" placeholder="Codice a barre...">
           <button class="btn-fotocamera" onclick="avviaFotocamera('carte')">📷 Scansiona</button>
         </div>
         <div id="video-container-carte">
-          <video id="video-carte" autoplay playsinline></video>
+          <video id="video-carte" autoplay playsinline muted></video>
           <button class="btn-stop" onclick="stopFotocamera('carte')">✕ Chiudi</button>
         </div>
         <button class="btn-salva" onclick="salvaCarta()">Salva carta</button>
@@ -536,19 +536,19 @@
       <div class="form-carta">
         <select id="app-seleziona">
           <option value="">-- Seleziona un'azienda --</option>
-          <option value="Edenred" data-link="https://www.edenred.it" data-saldo-url="https://www.edenred.it/area-personale">Edenred (Ticket Restaurant)</option>
-          <option value="Sodexo" data-link="https://it.sodexo.com" data-saldo-url="https://it.sodexo.com/area-riservata">Sodexo</option>
-          <option value="DayWelfare" data-link="https://www.daywelfare.it" data-saldo-url="https://www.daywelfare.it/area-clienti">Day Welfare</option>
-          <option value="Welfare360" data-link="https://www.welfare360.it" data-saldo-url="https://www.welfare360.it/area-personale">Welfare 360</option>
-          <option value="Repas" data-link="https://www.gruppopellegrini.it" data-saldo-url="https://www.gruppopellegrini.it/area-riservata">Repas (Pellegrini)</option>
-          <option value="Cobis" data-link="https://www.cobis.it" data-saldo-url="https://www.cobis.it/area-clienti">Cobis</option>
-          <option value="Up" data-link="https://www.upgroup.it" data-saldo-url="https://www.upgroup.it/area-personale">Up Group</option>
-          <option value="Altra" data-link="" data-saldo-url="">Altra app (personalizzata)</option>
+          <option value="Edenred" data-link="https://www.edenred.it">Edenred (Ticket Restaurant)</option>
+          <option value="Sodexo" data-link="https://it.sodexo.com">Sodexo</option>
+          <option value="DayWelfare" data-link="https://www.daywelfare.it">Day Welfare</option>
+          <option value="Welfare360" data-link="https://www.welfare360.it">Welfare 360</option>
+          <option value="Repas" data-link="https://www.gruppopellegrini.it">Repas (Pellegrini)</option>
+          <option value="Cobis" data-link="https://www.cobis.it">Cobis</option>
+          <option value="Up" data-link="https://www.upgroup.it">Up Group</option>
+          <option value="Altra" data-link="">Altra app (personalizzata)</option>
         </select>
-        <input type="text" id="app-nome-personalizzato" placeholder="Nome app (se hai selezionato Altra)" style="display:none;">
+        <input type="text" id="app-nome-personalizzato" placeholder="Nome app" style="display:none;">
         <input type="text" id="app-username" placeholder="Username / Email">
         <input type="password" id="app-password" placeholder="Password">
-        <input type="url" id="app-link" placeholder="Link sito web (opzionale)">
+        <input type="url" id="app-link" placeholder="Link sito web">
         <button class="btn-salva" onclick="salvaAppBuono()">Aggiungi app</button>
       </div>
       <div id="lista-app" class="lista-app"></div>
@@ -557,13 +557,13 @@
     <div class="sezione">
       <h2>➕ Buoni pasto fisici</h2>
       <div class="form-carta">
-        <input type="text" id="buono-nome" placeholder="Nome buono (es. Ticket Restaurant)">
+        <input type="text" id="buono-nome" placeholder="Nome buono">
         <div class="form-barcode" style="margin-bottom:0">
-          <input type="number" id="buono-codice" placeholder="Codice a barre...">
+          <input type="text" id="buono-codice" placeholder="Codice a barre...">
           <button class="btn-fotocamera" onclick="avviaFotocamera('buoni')">📷 Scansiona</button>
         </div>
         <div id="video-container-buoni">
-          <video id="video-buoni" autoplay playsinline></video>
+          <video id="video-buoni" autoplay playsinline muted></video>
           <button class="btn-stop" onclick="stopFotocamera('buoni')">✕ Chiudi</button>
         </div>
         <button class="btn-salva" onclick="salvaBuono()">Salva buono</button>
@@ -595,6 +595,7 @@
     let filtroAttivo = 'tutti';
     let streamAttivo = null;
     let modalitaScansione = null;
+    let lettoreAttivo = null;
 
     let carte = JSON.parse(localStorage.getItem('carte')) || [];
     let buoni = JSON.parse(localStorage.getItem('buoni')) || [];
@@ -606,6 +607,10 @@
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('attivo'));
       document.getElementById('pagina-' + pagina).classList.add('attiva');
       document.getElementById('nav-' + pagina).classList.add('attivo');
+      stopTutteFotocamere();
+    }
+    
+    function stopTutteFotocamere() {
       stopFotocamera('spesa');
       stopFotocamera('carte');
       stopFotocamera('buoni');
@@ -622,166 +627,45 @@
       document.getElementById('modale').classList.remove('aperta');
     }
 
-    // Mostra/nascondi campo nome personalizzato
-    document.getElementById('app-seleziona')?.addEventListener('change', function() {
-      const nomePersonalizzato = document.getElementById('app-nome-personalizzato');
-      if (this.value === 'Altra') {
-        nomePersonalizzato.style.display = 'block';
-      } else {
-        nomePersonalizzato.style.display = 'none';
-      }
-      
-      const selectedOption = this.options[this.selectedIndex];
-      const link = selectedOption.getAttribute('data-link') || '';
-      document.getElementById('app-link').value = link;
-    });
-
-    // SALVA APP BUONI
-    function salvaAppBuono() {
-      const select = document.getElementById('app-seleziona');
-      let nomeApp = select.value;
-      const nomePersonalizzato = document.getElementById('app-nome-personalizzato').value.trim();
-      
-      if (nomeApp === 'Altra' && nomePersonalizzato) {
-        nomeApp = nomePersonalizzato;
-      } else if (nomeApp === 'Altra' && !nomePersonalizzato) {
-        alert('Inserisci il nome della tua app!');
-        return;
-      } else if (nomeApp === '') {
-        alert('Seleziona un\'azienda dal menu!');
-        return;
-      }
-      
-      const username = document.getElementById('app-username').value.trim();
-      const password = document.getElementById('app-password').value;
-      
-      if (!username || !password) {
-        alert('Inserisci username e password');
-        return;
-      }
-      
-      const selectedOption = select.options[select.selectedIndex];
-      const saldoUrl = selectedOption.getAttribute('data-saldo-url') || '';
-      const link = document.getElementById('app-link').value.trim() || saldoUrl;
-      
-      const nuovaApp = {
-        id: Date.now(),
-        nome: nomeApp,
-        username: username,
-        password: btoa(password),
-        link: link,
-        saldo: null,
-        ultimoAggiornamento: null,
-        dataInserimento: new Date().toLocaleString()
-      };
-      
-      appsBuoni.push(nuovaApp);
-      localStorage.setItem('appsBuoni', JSON.stringify(appsBuoni));
-      
-      document.getElementById('app-seleziona').value = '';
-      document.getElementById('app-nome-personalizzato').value = '';
-      document.getElementById('app-username').value = '';
-      document.getElementById('app-password').value = '';
-      document.getElementById('app-link').value = '';
-      document.getElementById('app-nome-personalizzato').style.display = 'none';
-      
-      renderAppsBuoni();
-      alert(`App "${nomeApp}" salvata con successo!`);
-    }
-    
-    function getDecodedPassword(encodedPassword) {
-      try {
-        return atob(encodedPassword);
-      } catch(e) {
-        return encodedPassword;
-      }
-    }
-    
-    function aggiornaSaldoApp(id) {
-      const app = appsBuoni.find(a => a.id === id);
-      if (!app) return;
-      
-      const saldoCasuale = (Math.random() * 45 + 5).toFixed(2);
-      app.saldo = `€ ${saldoCasuale}`;
-      app.ultimoAggiornamento = new Date().toLocaleString();
-      
-      localStorage.setItem('appsBuoni', JSON.stringify(appsBuoni));
-      renderAppsBuoni();
-      alert(`Saldo aggiornato per ${app.nome}: ${app.saldo}`);
-    }
-    
-    function togglePasswordVisibility(id) {
-      const passwordSpan = document.getElementById(`password-${id}`);
-      if (passwordSpan) {
-        if (passwordSpan.style.display === 'none' || !passwordSpan.style.display) {
-          passwordSpan.style.display = 'inline';
-        } else {
-          passwordSpan.style.display = 'none';
-        }
-      }
-    }
-    
-    function eliminaAppBuono(id) {
-      if (confirm('Eliminare questa app? Le credenziali verranno rimosse.')) {
-        appsBuoni = appsBuoni.filter(a => a.id !== id);
-        localStorage.setItem('appsBuoni', JSON.stringify(appsBuoni));
-        renderAppsBuoni();
-      }
-    }
-    
-    function renderAppsBuoni() {
-      const container = document.getElementById('lista-app');
-      if (!appsBuoni.length) {
-        container.innerHTML = '<p style="text-align:center;color:#aaa;padding:20px">Nessuna app salvata. Aggiungi la tua app buoni pasto!</p>';
-        return;
-      }
-      
-      container.innerHTML = appsBuoni.map(app => {
-        const decodedPassword = getDecodedPassword(app.password);
-        const maskedPassword = '•'.repeat(Math.min(decodedPassword.length, 8));
-        
-        return `
-        <div class="app-buono-card">
-          <div class="app-info">
-            <div class="app-nome">${escapeHtml(app.nome)}</div>
-            <div class="app-crediti">
-              👤 Username: ${escapeHtml(app.username)}<br>
-              🔒 Password: ${maskedPassword}
-              <button class="mostra-password" onclick="togglePasswordVisibility(${app.id})" style="font-size:0.7rem;">👁️</button>
-              <span id="password-${app.id}" style="display:none; font-size:0.7rem; color:#2D6A4F;"> (${decodedPassword})</span>
-            </div>
-            ${app.saldo ? `<div class="app-saldo">💰 Saldo: ${app.saldo}</div>` : '<div class="app-saldo" style="color:#888;">💰 Saldo non disponibile</div>'}
-            ${app.ultimoAggiornamento ? `<div class="app-crediti">🕐 Aggiornato: ${app.ultimoAggiornamento}</div>` : ''}
-          </div>
-          <div class="carta-azioni">
-            ${app.link ? `<a class="btn-apri-app" href="${app.link}" target="_blank">Apri sito</a>` : ''}
-            <button class="btn-aggiorna-saldo" onclick="aggiornaSaldoApp(${app.id})">🔄 Saldo</button>
-            <button class="btn-elimina-carta" onclick="eliminaAppBuono(${app.id})">✕</button>
-          </div>
-        </div>
-      `}).join('');
-    }
-    
-    // GESTIONE FOTOCAMERA
+    // GESTIONE FOTOCAMERA CORRETTA
     async function avviaFotocamera(modalita) {
-      stopFotocamera(modalita);
+      // Ferma eventuali altre fotocamere attive
+      stopTutteFotocamere();
+      
       const containerId = `video-container${modalita === 'spesa' ? '' : '-' + modalita}`;
       const videoId = `video-${modalita === 'spesa' ? 'spesa' : modalita}`;
       const container = document.getElementById(containerId);
       const videoElem = document.getElementById(videoId);
 
-      if (!container || !videoElem) return;
+      if (!container || !videoElem) {
+        console.error('Container o video non trovati');
+        return;
+      }
 
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        // Richiedi accesso alla fotocamera posteriore
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode: { exact: "environment" } } 
+        });
+        
         streamAttivo = stream;
         videoElem.srcObject = stream;
+        videoElem.setAttribute('playsinline', true);
+        await videoElem.play();
         container.style.display = 'block';
         modalitaScansione = modalita;
 
+        // Carica dinamicamente ZXing
         const { BrowserMultiFormatReader } = await import('https://unpkg.com/@zxing/browser@0.1.4/esm/index.js');
-        const lettore = new BrowserMultiFormatReader();
-        lettore.decodeFromVideoDevice(null, videoId, (risultato, errore) => {
+        
+        if (lettoreAttivo) {
+          try { lettoreAttivo.reset(); } catch(e) {}
+        }
+        
+        lettoreAttivo = new BrowserMultiFormatReader();
+        
+        // Avvia la scansione dal video
+        lettoreAttivo.decodeFromVideoElement(videoElem, (risultato, errore) => {
           if (risultato && modalitaScansione === modalita) {
             const codiceLetto = risultato.getText();
             if (modalita === 'spesa') {
@@ -797,8 +681,16 @@
             }
           }
         });
+        
       } catch (err) {
-        alert('Impossibile accedere alla fotocamera.');
+        console.error('Errore fotocamera:', err);
+        let msg = 'Impossibile accedere alla fotocamera.\n\n';
+        msg += 'Verifica che:\n';
+        msg += '1. Hai dato il permesso di accesso\n';
+        msg += '2. Il sito è in HTTPS\n';
+        msg += '3. Il tuo telefono ha una fotocamera funzionante\n\n';
+        msg += 'Se il problema persiste, usa Chrome e ricarica la pagina.';
+        alert(msg);
       }
     }
 
@@ -807,6 +699,14 @@
       const videoId = `video-${modalita === 'spesa' ? 'spesa' : modalita}`;
       const container = document.getElementById(containerId);
       const videoElem = document.getElementById(videoId);
+      
+      if (lettoreAttivo && modalitaScansione === modalita) {
+        try {
+          lettoreAttivo.reset();
+          lettoreAttivo = null;
+        } catch(e) {}
+      }
+      
       if (videoElem && videoElem.srcObject) {
         videoElem.srcObject.getTracks().forEach(track => track.stop());
         videoElem.srcObject = null;
@@ -834,11 +734,11 @@
           input.value = '';
         } else {
           risultatoDiv.className = 'risultato-barcode errore';
-          risultatoDiv.textContent = '✕ Prodotto non trovato.';
+          risultatoDiv.textContent = '✕ Prodotto non trovato. Aggiungi manualmente.';
         }
       } catch (e) {
         risultatoDiv.className = 'risultato-barcode errore';
-        risultatoDiv.textContent = '✕ Errore di rete';
+        risultatoDiv.textContent = '✕ Errore di connessione';
       }
     }
 
@@ -851,33 +751,39 @@
       renderLista();
       aggiornaContatori();
     }
+    
     function toggleFatto(id) {
       const p = prodotti.find(p => p.id === id);
       if (p) p.fatto = !p.fatto;
       renderLista();
       aggiornaContatori();
     }
+    
     function cambiaQuantita(id, delta) {
       const p = prodotti.find(p => p.id === id);
       if (p) { p.quantita = Math.max(1, p.quantita + delta); }
       renderLista();
     }
+    
     function eliminaProdotto(id) {
       prodotti = prodotti.filter(p => p.id !== id);
       renderLista();
       aggiornaContatori();
     }
+    
     function pulisciCompletati() {
       prodotti = prodotti.filter(p => !p.fatto);
       renderLista();
       aggiornaContatori();
     }
+    
     function setFiltro(tipo, btn) {
       filtroAttivo = tipo;
       document.querySelectorAll('.filtro').forEach(b => b.classList.remove('attivo'));
       btn.classList.add('attivo');
       renderLista();
     }
+    
     function renderLista() {
       let listaFiltrata = prodotti;
       if (filtroAttivo === 'mancano') listaFiltrata = prodotti.filter(p => !p.fatto);
@@ -900,12 +806,14 @@
         </div>
       `).join('');
     }
+    
     function aggiornaContatori() {
       document.getElementById('tot').textContent = prodotti.length;
       const presi = prodotti.filter(p => p.fatto).length;
       document.getElementById('presi').textContent = presi;
       document.getElementById('mancano').textContent = prodotti.length - presi;
     }
+    
     function escapeHtml(str) {
       if (!str) return '';
       return str.replace(/[&<>]/g, function(m) {
@@ -927,11 +835,13 @@
       document.getElementById('carta-codice').value = '';
       renderCarte();
     }
+    
     function eliminaCarta(id) {
       carte = carte.filter(c => c.id !== id);
       localStorage.setItem('carte', JSON.stringify(carte));
       renderCarte();
     }
+    
     function renderCarte() {
       const container = document.getElementById('lista-carte');
       if (!carte.length) {
@@ -952,22 +862,132 @@
       `).join('');
     }
 
-    // BUONI PASTO FISICI
+    // APP BUONI
+    function salvaAppBuono() {
+      const select = document.getElementById('app-seleziona');
+      let nomeApp = select.value;
+      const nomePersonalizzato = document.getElementById('app-nome-personalizzato').value.trim();
+      
+      if (nomeApp === 'Altra' && nomePersonalizzato) {
+        nomeApp = nomePersonalizzato;
+      } else if (nomeApp === 'Altra' && !nomePersonalizzato) {
+        alert('Inserisci il nome della tua app!');
+        return;
+      } else if (nomeApp === '') {
+        alert('Seleziona un\'azienda dal menu!');
+        return;
+      }
+      
+      const username = document.getElementById('app-username').value.trim();
+      const password = document.getElementById('app-password').value;
+      const link = document.getElementById('app-link').value.trim();
+      
+      if (!username || !password) {
+        alert('Inserisci username e password');
+        return;
+      }
+      
+      const nuovaApp = {
+        id: Date.now(),
+        nome: nomeApp,
+        username: username,
+        password: btoa(password),
+        link: link,
+        saldo: null,
+        ultimoAggiornamento: null
+      };
+      
+      appsBuoni.push(nuovaApp);
+      localStorage.setItem('appsBuoni', JSON.stringify(appsBuoni));
+      
+      document.getElementById('app-seleziona').value = '';
+      document.getElementById('app-nome-personalizzato').value = '';
+      document.getElementById('app-username').value = '';
+      document.getElementById('app-password').value = '';
+      document.getElementById('app-link').value = '';
+      document.getElementById('app-nome-personalizzato').style.display = 'none';
+      
+      renderAppsBuoni();
+      alert(`App "${nomeApp}" salvata!`);
+    }
+    
+    function getDecodedPassword(encoded) {
+      try { return atob(encoded); } catch(e) { return encoded; }
+    }
+    
+    function aggiornaSaldoApp(id) {
+      const app = appsBuoni.find(a => a.id === id);
+      if (!app) return;
+      const saldo = (Math.random() * 45 + 5).toFixed(2);
+      app.saldo = `€ ${saldo}`;
+      app.ultimoAggiornamento = new Date().toLocaleString();
+      localStorage.setItem('appsBuoni', JSON.stringify(appsBuoni));
+      renderAppsBuoni();
+      alert(`Saldo ${app.nome}: ${app.saldo}`);
+    }
+    
+    function togglePasswordVisibility(id) {
+      const span = document.getElementById(`password-${id}`);
+      if (span) span.style.display = span.style.display === 'none' ? 'inline' : 'none';
+    }
+    
+    function eliminaAppBuono(id) {
+      if (confirm('Eliminare questa app?')) {
+        appsBuoni = appsBuoni.filter(a => a.id !== id);
+        localStorage.setItem('appsBuoni', JSON.stringify(appsBuoni));
+        renderAppsBuoni();
+      }
+    }
+    
+    function renderAppsBuoni() {
+      const container = document.getElementById('lista-app');
+      if (!appsBuoni.length) {
+        container.innerHTML = '<p style="text-align:center;color:#aaa;padding:20px">Nessuna app salvata</p>';
+        return;
+      }
+      container.innerHTML = appsBuoni.map(app => {
+        const decoded = getDecodedPassword(app.password);
+        const masked = '•'.repeat(Math.min(decoded.length, 8));
+        return `
+        <div class="app-buono-card">
+          <div class="app-info">
+            <div class="app-nome">${escapeHtml(app.nome)}</div>
+            <div class="app-crediti">
+              👤 ${escapeHtml(app.username)}<br>
+              🔒 ${masked}
+              <button class="mostra-password" onclick="togglePasswordVisibility(${app.id})">👁️</button>
+              <span id="password-${app.id}" style="display:none;"> (${decoded})</span>
+            </div>
+            ${app.saldo ? `<div class="app-saldo">💰 ${app.saldo}</div>` : ''}
+            ${app.ultimoAggiornamento ? `<div class="app-crediti">🕐 ${app.ultimoAggiornamento}</div>` : ''}
+          </div>
+          <div class="carta-azioni">
+            ${app.link ? `<a class="btn-apri-app" href="${app.link}" target="_blank">Apri</a>` : ''}
+            <button class="btn-aggiorna-saldo" onclick="aggiornaSaldoApp(${app.id})">🔄</button>
+            <button class="btn-elimina-carta" onclick="eliminaAppBuono(${app.id})">✕</button>
+          </div>
+        </div>
+      `}).join('');
+    }
+
+    // BUONI FISICI
     function salvaBuono() {
       const nome = document.getElementById('buono-nome').value.trim();
       const codice = document.getElementById('buono-codice').value.trim();
-      if (!nome || !codice) { alert('Inserisci nome e codice del buono'); return; }
+      if (!nome || !codice) { alert('Inserisci nome e codice'); return; }
       buoni.push({ id: Date.now(), nome: nome, codice: codice });
       localStorage.setItem('buoni', JSON.stringify(buoni));
       document.getElementById('buono-nome').value = '';
       document.getElementById('buono-codice').value = '';
       renderBuoni();
     }
+    
     function eliminaBuono(id) {
       buoni = buoni.filter(b => b.id !== id);
       localStorage.setItem('buoni', JSON.stringify(buoni));
       renderBuoni();
     }
+    
     function renderBuoni() {
       const container = document.getElementById('lista-buoni');
       if (!buoni.length) {
@@ -988,11 +1008,24 @@
       `).join('');
     }
 
+    // Seleziona app personalizzata
+    document.getElementById('app-seleziona')?.addEventListener('change', function() {
+      const personalizzato = document.getElementById('app-nome-personalizzato');
+      personalizzato.style.display = this.value === 'Altra' ? 'block' : 'none';
+      const opt = this.options[this.selectedIndex];
+      document.getElementById('app-link').value = opt.getAttribute('data-link') || '';
+    });
+
+    // EVENTI KEYBOARD
+    document.getElementById('campo-input')?.addEventListener('keydown', e => e.key === 'Enter' && aggiungiProdotto());
+    document.getElementById('campo-barcode')?.addEventListener('keydown', e => e.key === 'Enter' && cercaBarcode());
+
+    // SERVICE WORKER
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error:', err));
+    }
+
     // ESPONI FUNZIONI GLOBALI
-    window.togglePasswordVisibility = togglePasswordVisibility;
-    window.aggiornaSaldoApp = aggiornaSaldoApp;
-    window.eliminaAppBuono = eliminaAppBuono;
-    window.salvaAppBuono = salvaAppBuono;
     window.avviaFotocamera = avviaFotocamera;
     window.stopFotocamera = stopFotocamera;
     window.cercaBarcode = cercaBarcode;
@@ -1006,20 +1039,13 @@
     window.eliminaCarta = eliminaCarta;
     window.salvaBuono = salvaBuono;
     window.eliminaBuono = eliminaBuono;
+    window.salvaAppBuono = salvaAppBuono;
+    window.eliminaAppBuono = eliminaAppBuono;
+    window.aggiornaSaldoApp = aggiornaSaldoApp;
+    window.togglePasswordVisibility = togglePasswordVisibility;
     window.mostraModale = mostraModale;
     window.chiudiModale = chiudiModale;
     window.vaiA = vaiA;
-
-    // ENTER
-    document.getElementById('campo-input')?.addEventListener('keydown', e => e.key === 'Enter' && aggiungiProdotto());
-    document.getElementById('campo-barcode')?.addEventListener('keydown', e => e.key === 'Enter' && cercaBarcode());
-
-    // REGISTRAZIONE SERVICE WORKER PER PWA
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(err => {
-        console.log('Service Worker non registrato:', err);
-      });
-    }
 
     // INIT
     renderLista();
