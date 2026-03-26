@@ -121,10 +121,24 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 40px;
+      padding: 40px 20px;
+      overflow-y: auto;
     }
     .family-login.hidden { display: none; }
-    .family-login h2 { color: #2D6A4F; margin-bottom: 20px; text-align: center; }
+    .family-login h2 { color: #2D6A4F; margin-bottom: 10px; text-align: center; font-size: 1.8rem; }
+    .family-login .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 0.9rem; }
+    .family-login .info-box {
+      background: #E8F5E9;
+      border-radius: 16px;
+      padding: 15px;
+      margin-bottom: 25px;
+      border-left: 4px solid #2D6A4F;
+    }
+    .family-login .info-box p {
+      font-size: 0.85rem;
+      color: #2D6A4F;
+      line-height: 1.4;
+    }
     .family-login input {
       padding: 14px;
       border: 1.5px solid #E2DFD8;
@@ -133,6 +147,7 @@
       margin-bottom: 12px;
       text-align: center;
       letter-spacing: 2px;
+      background: white;
     }
     .family-login button {
       background: #2D6A4F;
@@ -172,6 +187,28 @@
       border-radius: 30px;
       margin-top: 10px;
       cursor: pointer;
+    }
+    .divider {
+      text-align: center;
+      margin: 20px 0;
+      position: relative;
+    }
+    .divider::before,
+    .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: #E2DFD8;
+    }
+    .divider::before { left: 0; }
+    .divider::after { right: 0; }
+    .divider span {
+      background: #F5F2EB;
+      padding: 0 10px;
+      color: #888;
+      font-size: 0.8rem;
     }
     
     /* Altri stili (già esistenti) */
@@ -253,17 +290,31 @@
   <!-- SCHERMATA LOGIN FAMIGLIA -->
   <div id="family-login" class="family-login">
     <h2>👨‍👩‍👧‍👦 SmartSpesa</h2>
-    <p style="text-align:center; margin-bottom:20px;">Inserisci il codice della tua famiglia</p>
+    <p class="subtitle">La spesa condivisa con la famiglia</p>
+    
+    <!-- BOX INFORMATIVO -->
+    <div class="info-box">
+      <p>📌 <strong>Come funziona?</strong><br>
+      Inserisci il codice della tua famiglia qui sotto se ne possiedi già uno,<br>
+      oppure clicca su <strong>"➕ Crea nuova famiglia"</strong> per generare un codice da condividere con i tuoi familiari.</p>
+    </div>
+    
     <input type="text" id="family-code-input" placeholder="Codice famiglia (es. ABC123)" maxlength="10" style="text-transform:uppercase">
-    <button onclick="accediFamiglia()">Accedi</button>
+    <button onclick="accediFamiglia()">🔑 Accedi con questo codice</button>
+    
+    <div class="divider">
+      <span>oppure</span>
+    </div>
+    
     <button onclick="mostraCreaFamiglia()" class="btn-secondary">➕ Crea nuova famiglia</button>
     
     <div id="crea-famiglia-section" style="display:none; margin-top:20px;">
       <hr style="margin:15px 0;">
-      <p style="text-align:center;">🏠 Crea una nuova famiglia</p>
-      <input type="text" id="new-family-name" placeholder="Nome famiglia (es. Rossi)">
-      <button onclick="creaNuovaFamiglia()">Crea famiglia</button>
-      <button onclick="nascondiCreaFamiglia()" class="btn-secondary">Annulla</button>
+      <p style="text-align:center; margin-bottom:10px;">🏠 <strong>Crea una nuova famiglia</strong></p>
+      <p style="font-size:0.8rem; color:#666; text-align:center; margin-bottom:12px;">Scegli un nome per la tua famiglia. Verrà generato un codice unico da condividere.</p>
+      <input type="text" id="new-family-name" placeholder="Nome famiglia (es. Rossi, Bianchi...)" style="text-align:left;">
+      <button onclick="creaNuovaFamiglia()">Crea famiglia e genera codice</button>
+      <button onclick="nascondiCreaFamiglia()" class="btn-secondary" style="margin-top:8px;">Annulla</button>
     </div>
   </div>
 
@@ -410,26 +461,10 @@
     // ============================================================
     let tutorialStep = 1;
     const tutorialSteps = [
-      {
-        step: 1,
-        title: "👋 Benvenuto in SmartSpesa!",
-        content: "<p>SmartSpesa ti aiuta a gestire la spesa con tutta la famiglia in modo semplice e sincronizzato!</p><div class='highlight'>🎯 Tutti i membri della famiglia vedono la stessa lista in tempo reale</div>"
-      },
-      {
-        step: 2,
-        title: "🏠 Crea la tua famiglia",
-        content: "<p>Per iniziare, crea una famiglia:</p><div class='highlight'>1. Clicca su <strong>'Crea nuova famiglia'</strong><br>2. Inserisci un nome (es. 'Rossi')<br>3. L'app genererà un codice unico</div>"
-      },
-      {
-        step: 3,
-        title: "🔑 Condividi il codice",
-        content: "<p>Il codice della tua famiglia apparirà in alto nell'app.</p><div class='highlight'>📲 Condividi questo codice con i tuoi familiari<br>⚡ Loro potranno accedere alla stessa lista!</div><p style='margin-top:10px;'>Esempio di codice: <span class='code-demo'>ABC123</span></p>"
-      },
-      {
-        step: 4,
-        title: "📝 Inizia a usare l'app!",
-        content: "<p>Ora puoi:</p><ul style='margin-left:20px; margin-top:10px;'><li>✅ Aggiungere prodotti alla lista della spesa</li><li>💳 Salvare carte fedeltà con barcode</li><li>🍽️ Gestire buoni pasto e saldo</li><li>🔄 Tutto si sincronizza automaticamente con la famiglia!</li></ul>"
-      }
+      { step: 1, title: "👋 Benvenuto in SmartSpesa!", content: "<p>SmartSpesa ti aiuta a gestire la spesa con tutta la famiglia in modo semplice e sincronizzato!</p><div class='highlight'>🎯 Tutti i membri della famiglia vedono la stessa lista in tempo reale</div>" },
+      { step: 2, title: "🏠 Crea o unisciti a una famiglia", content: "<p>Per iniziare:</p><div class='highlight'>• Se hai già un codice famiglia, inseriscilo e clicca ACCEDI<br>• Se sei il primo, clicca su 'Crea nuova famiglia'</div>" },
+      { step: 3, title: "🔑 Condividi il codice", content: "<p>Dopo aver creato la famiglia, l'app genererà un codice unico.</p><div class='highlight'>📲 Condividi questo codice con i tuoi familiari<br>⚡ Loro potranno accedere alla stessa lista!</div><p style='margin-top:10px;'>Esempio di codice: <span class='code-demo'>ABC123</span></p>" },
+      { step: 4, title: "📝 Inizia a usare l'app!", content: "<p>Ora puoi:</p><ul style='margin-left:20px; margin-top:10px;'><li>✅ Aggiungere prodotti alla lista della spesa</li><li>💳 Salvare carte fedeltà con barcode</li><li>🍽️ Gestire buoni pasto e saldo</li><li>🔄 Tutto si sincronizza automaticamente con la famiglia!</li></ul>" }
     ];
     
     function showTutorialStep() {
@@ -439,12 +474,9 @@
         document.getElementById('tutorial-title').textContent = stepData.title;
         document.getElementById('tutorial-content').innerHTML = stepData.content;
         
-        const prevBtn = document.querySelector('.btn-prev');
-        if (tutorialStep === 1 && prevBtn) prevBtn.remove();
         if (tutorialStep > 1 && !document.querySelector('.btn-prev')) {
           const btns = document.querySelector('.tutorial-buttons');
           const skipBtn = btns.querySelector('.btn-skip');
-          const nextBtn = btns.querySelector('.btn-next');
           const prevBtnNew = document.createElement('button');
           prevBtnNew.className = 'btn-prev';
           prevBtnNew.textContent = '← Indietro';
@@ -457,28 +489,10 @@
       }
     }
     
-    function nextTutorial() {
-      if (tutorialStep < 4) {
-        tutorialStep++;
-        showTutorialStep();
-      } else {
-        skipTutorial();
-      }
-    }
+    function nextTutorial() { if (tutorialStep < 4) { tutorialStep++; showTutorialStep(); } else { skipTutorial(); } }
+    function prevTutorial() { if (tutorialStep > 1) { tutorialStep--; showTutorialStep(); } }
+    function skipTutorial() { localStorage.setItem('smartspesa_tutorial_seen', 'true'); document.getElementById('tutorial-overlay').classList.add('hidden'); }
     
-    function prevTutorial() {
-      if (tutorialStep > 1) {
-        tutorialStep--;
-        showTutorialStep();
-      }
-    }
-    
-    function skipTutorial() {
-      localStorage.setItem('smartspesa_tutorial_seen', 'true');
-      document.getElementById('tutorial-overlay').classList.add('hidden');
-    }
-    
-    // Mostra tutorial solo se non è stato già visto
     if (!localStorage.getItem('smartspesa_tutorial_seen')) {
       document.getElementById('tutorial-overlay').classList.remove('hidden');
     } else {
@@ -621,7 +635,7 @@
       });
     }
     
-    // FUNZIONI APP (semplificate per brevità)
+    // FUNZIONI APP
     function aggiungiProdotto() {
       const nome = document.getElementById('campo-input').value.trim();
       if (!nome) return;
@@ -647,7 +661,6 @@
     function aggiornaContatori() { document.getElementById('tot').textContent = prodotti.length; const presi = prodotti.filter(p => p.fatto).length; document.getElementById('presi').textContent = presi; document.getElementById('mancano').textContent = prodotti.length - presi; }
     function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
     
-    // CARTE
     function salvaCarta() {
       const nome = document.getElementById('carta-nome').value.trim();
       const codice = document.getElementById('carta-codice').value.trim();
@@ -663,17 +676,11 @@
       container.innerHTML = carte.map(c => `<div class="carta"><div class="carta-info"><div class="carta-nome">${escapeHtml(c.nome)}</div><div class="carta-codice">${c.codice}</div></div><div class="carta-azioni"><button class="btn-mostra" onclick="mostraModale('${escapeHtml(c.nome)}', '${c.codice}')">Mostra</button><button class="btn-elimina-carta" onclick="eliminaCarta(${c.id})">✕</button></div></div>`).join('');
     }
     
-    // BUONI (struttura base)
-    function salvaAppBuono() { /* logica completa */ showToast('App salvata'); }
-    function impostaSaldoIniziale(id) { showToast('Funzionalità in sviluppo'); }
-    function registraSpesa(id) { showToast('Funzionalità in sviluppo'); }
-    function eliminaAppBuono(id) { showToast('Funzionalità in sviluppo'); }
+    function salvaAppBuono() { showToast('Funzionalità in sviluppo'); }
     function renderAppsBuoni() { document.getElementById('lista-app').innerHTML = '<p style="text-align:center;color:#aaa;padding:20px">Nessuna app salvata</p>'; }
-    function salvaBuono() { showToast('Buono salvato'); }
-    function eliminaBuono(id) { showToast('Buono eliminato'); }
+    function salvaBuono() { showToast('Funzionalità in sviluppo'); }
     function renderBuoni() { document.getElementById('lista-buoni').innerHTML = '<p style="text-align:center;color:#aaa;padding:20px">Nessun buono salvato</p>'; }
     
-    // FOTOCAMERA e NAVIGAZIONE (semplificate)
     function vaiA(pagina) { document.querySelectorAll('.pagina').forEach(p => p.classList.remove('attiva')); document.getElementById('pagina-' + pagina).classList.add('attiva'); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('attivo')); document.getElementById('nav-' + pagina).classList.add('attivo'); }
     async function avviaFotocamera(modalita) { showToast('Fotocamera avviata'); }
     function stopFotocamera(modalita) { }
@@ -688,8 +695,10 @@
     window.aggiungiProdotto = aggiungiProdotto; window.toggleFatto = toggleFatto; window.cambiaQuantita = cambiaQuantita;
     window.eliminaProdotto = eliminaProdotto; window.pulisciCompletati = pulisciCompletati; window.setFiltro = setFiltro;
     window.salvaCarta = salvaCarta; window.eliminaCarta = eliminaCarta; window.salvaBuono = salvaBuono; window.eliminaBuono = eliminaBuono;
-    window.salvaAppBuono = salvaAppBuono; window.eliminaAppBuono = eliminaAppBuono; window.impostaSaldoIniziale = impostaSaldoIniziale;
-    window.registraSpesa = registraSpesa; window.mostraStorico = function(id) { document.getElementById('storico-modal').classList.add('active'); };
+    window.salvaAppBuono = salvaAppBuono; window.eliminaAppBuono = function(id) { showToast('Funzionalità in sviluppo'); };
+    window.impostaSaldoIniziale = function(id) { showToast('Funzionalità in sviluppo'); };
+    window.registraSpesa = function(id) { showToast('Funzionalità in sviluppo'); };
+    window.mostraStorico = function(id) { document.getElementById('storico-modal').classList.add('active'); };
     window.chiudiStorico = chiudiStorico; window.apriLink = apriLink; window.togglePasswordVisibility = togglePasswordVisibility;
     window.mostraModale = mostraModale; window.chiudiModale = chiudiModale; window.vaiA = vaiA;
     window.accediFamiglia = accediFamiglia; window.creaNuovaFamiglia = creaNuovaFamiglia; window.mostraCreaFamiglia = mostraCreaFamiglia;
