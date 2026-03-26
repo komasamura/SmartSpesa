@@ -127,6 +127,7 @@
     video {
       width: 100%;
       display: block;
+      transform: scaleX(-1);
     }
     .btn-stop {
       background: transparent;
@@ -623,14 +624,15 @@
       JsBarcode('#modale-barcode', codice, { format: 'CODE128', width: 2, height: 80, displayValue: false });
       document.getElementById('modale').classList.add('aperta');
     }
+    
     function chiudiModale() {
       document.getElementById('modale').classList.remove('aperta');
     }
 
-    // GESTIONE FOTOCAMERA CORRETTA
+    // GESTIONE FOTOCAMERA - VERSIONE SEMPLIFICATA E FUNZIONANTE
     async function avviaFotocamera(modalita) {
-      // Ferma eventuali altre fotocamere attive
-      stopTutteFotocamere();
+      // Ferma eventuali fotocamere già attive
+      stopFotocamera(modalita);
       
       const containerId = `video-container${modalita === 'spesa' ? '' : '-' + modalita}`;
       const videoId = `video-${modalita === 'spesa' ? 'spesa' : modalita}`;
@@ -638,7 +640,7 @@
       const videoElem = document.getElementById(videoId);
 
       if (!container || !videoElem) {
-        console.error('Container o video non trovati');
+        alert('Errore: componente fotocamera non trovato');
         return;
       }
 
@@ -650,24 +652,18 @@
         
         streamAttivo = stream;
         videoElem.srcObject = stream;
-        videoElem.setAttribute('playsinline', true);
         await videoElem.play();
         container.style.display = 'block';
         modalitaScansione = modalita;
-
-        // Carica dinamicamente ZXing
+        
+        // Avvia la scansione con ZXing
         const { BrowserMultiFormatReader } = await import('https://unpkg.com/@zxing/browser@0.1.4/esm/index.js');
-        
-        if (lettoreAttivo) {
-          try { lettoreAttivo.reset(); } catch(e) {}
-        }
-        
         lettoreAttivo = new BrowserMultiFormatReader();
         
-        // Avvia la scansione dal video
         lettoreAttivo.decodeFromVideoElement(videoElem, (risultato, errore) => {
           if (risultato && modalitaScansione === modalita) {
             const codiceLetto = risultato.getText();
+            
             if (modalita === 'spesa') {
               document.getElementById('campo-barcode').value = codiceLetto;
               stopFotocamera('spesa');
@@ -675,9 +671,11 @@
             } else if (modalita === 'carte') {
               document.getElementById('carta-codice').value = codiceLetto;
               stopFotocamera('carte');
+              alert('Codice acquisito: ' + codiceLetto);
             } else if (modalita === 'buoni') {
               document.getElementById('buono-codice').value = codiceLetto;
               stopFotocamera('buoni');
+              alert('Codice acquisito: ' + codiceLetto);
             }
           }
         });
@@ -685,11 +683,10 @@
       } catch (err) {
         console.error('Errore fotocamera:', err);
         let msg = 'Impossibile accedere alla fotocamera.\n\n';
-        msg += 'Verifica che:\n';
-        msg += '1. Hai dato il permesso di accesso\n';
+        msg += '1. Assicurati di aver dato il permesso\n';
         msg += '2. Il sito è in HTTPS\n';
-        msg += '3. Il tuo telefono ha una fotocamera funzionante\n\n';
-        msg += 'Se il problema persiste, usa Chrome e ricarica la pagina.';
+        msg += '3. Il telefono ha una fotocamera funzionante\n\n';
+        msg += 'Errore: ' + err.message;
         alert(msg);
       }
     }
