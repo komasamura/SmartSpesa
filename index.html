@@ -1016,7 +1016,7 @@
 
     // REGISTRAZIONE SERVICE WORKER PER PWA
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(err => {
+      navigator.serviceWorker.register('sw.js').catch(err => {
         console.log('Service Worker non registrato:', err);
       });
     }
