@@ -165,27 +165,13 @@
       color: #2D6A4F;
       border: 1px solid #2D6A4F;
     }
-    .family-code-display {
-      background: #E8F5E9;
-      padding: 15px;
-      border-radius: 20px;
-      text-align: center;
-      margin: 15px 0;
-    }
-    .family-code {
-      font-size: 1.8rem;
-      font-weight: bold;
-      letter-spacing: 5px;
-      color: #2D6A4F;
-      font-family: monospace;
-    }
     .btn-copy {
       background: #2D6A4F;
       color: white;
       border: none;
-      padding: 8px 16px;
-      border-radius: 30px;
-      margin-top: 10px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.7rem;
       cursor: pointer;
     }
     .divider {
@@ -211,12 +197,13 @@
       font-size: 0.8rem;
     }
     
-    /* Altri stili (già esistenti) */
+    /* Form e liste */
     .form-barcode { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
     .form-barcode input { flex: 2; padding: 12px 14px; border: 1.5px solid #E2DFD8; border-radius: 18px; font-size: 0.95rem; background: #FEFEFC; }
     .btn-cerca, .btn-fotocamera { background: #2D6A4F; border: none; padding: 0 16px; border-radius: 40px; font-weight: 500; color: white; cursor: pointer; font-size: 0.85rem; }
     .btn-fotocamera { background: #E9E6DF; color: #2D6A4F; border: 1px solid #D4D0C8; }
     .risultato-barcode { font-size: 0.8rem; margin-top: 8px; color: #2C6E4F; font-weight: 500; }
+    .risultato-barcode.errore { color: #C33C2C; }
     .scanner-container { margin-top: 16px; position: relative; display: none; }
     .scanner-container video { width: 100%; border-radius: 20px; }
     .btn-stop { background: #E63946; color: white; border: none; padding: 10px; border-radius: 40px; margin-top: 10px; width: 100%; cursor: pointer; font-weight: bold; }
@@ -230,6 +217,7 @@
     .filtro { background: transparent; border: 1px solid #D9D5CC; border-radius: 30px; padding: 6px 16px; font-size: 0.8rem; cursor: pointer; color: #6E6C66; }
     .filtro.attivo { background: #2D6A4F; border-color: #2D6A4F; color: white; }
     .elemento { background: white; border-radius: 20px; display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 10px; border: 1px solid #EFECE6; }
+    .elemento.fatto { background: #F3F9F4; opacity: 0.85; }
     .check-box { width: 24px; height: 24px; border: 2px solid #D4D0C8; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .check-box.checked { background: #2D6A4F; border-color: #2D6A4F; color: white; }
     .testo { flex: 1; font-size: 1rem; color: #1A2C2A; }
@@ -247,10 +235,15 @@
     .carta, .app-buono-card { background: #FEFCF8; border: 1px solid #E9E6DF; border-radius: 20px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; }
     .carta-info, .app-info { flex: 1; }
     .carta-nome, .app-nome { font-weight: 600; font-size: 0.95rem; color: #2D6A4F; }
+    .carta-codice { font-size: 0.7rem; color: #888; font-family: monospace; }
     .app-crediti { font-size: 0.7rem; color: #666; margin-top: 4px; }
     .app-saldo { font-size: 0.85rem; font-weight: 700; color: #2D6A4F; margin-top: 4px; background: #E8F5E9; padding: 4px 8px; border-radius: 12px; display: inline-block; }
+    .app-spese { font-size: 0.7rem; color: #E63946; margin-top: 4px; }
     .carta-azioni, .app-azioni { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
     .btn-mostra, .btn-apri-app, .btn-elimina-carta, .btn-saldo-iniziale, .btn-usa-buono, .btn-storico { background: #2D6A4F; color: white; border: none; border-radius: 30px; padding: 6px 12px; cursor: pointer; font-size: 0.7rem; }
+    .btn-apri-app { background: #1E3A8A; }
+    .btn-usa-buono { background: #E63946; }
+    .btn-storico { background: #6B7280; }
     .mostra-password { background: transparent; border: none; cursor: pointer; font-size: 1rem; margin-left: 5px; }
     .modale { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; gap: 24px; }
     .modale.aperta { display: flex; }
@@ -263,6 +256,26 @@
     .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #2D6A4F; color: white; padding: 10px 20px; border-radius: 50px; font-size: 0.85rem; z-index: 1000; animation: fadeOut 2s ease forwards; pointer-events: none; }
     @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
     .sync-status { background: #E8F5E9; padding: 8px 12px; border-radius: 20px; font-size: 0.7rem; color: #2D6A4F; margin-bottom: 10px; text-align: center; }
+    .storico-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border-radius: 24px;
+      padding: 20px;
+      max-width: 90%;
+      max-height: 80%;
+      overflow: auto;
+      z-index: 2000;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      display: none;
+    }
+    .storico-modal.active { display: block; }
+    .storico-modal h3 { margin-bottom: 15px; color: #2D6A4F; }
+    .storico-modal ul { list-style: none; padding: 0; }
+    .storico-modal li { padding: 8px 0; border-bottom: 1px solid #E9E6DF; }
+    .storico-modal .close-storico { background: #E63946; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 15px; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -276,9 +289,7 @@
       </div>
       <div class="tutorial-content" id="tutorial-content">
         <p>SmartSpesa ti aiuta a gestire la spesa con tutta la famiglia in modo semplice e sincronizzato!</p>
-        <div class="highlight">
-          🎯 Tutti i membri della famiglia vedono la stessa lista in tempo reale
-        </div>
+        <div class="highlight">🎯 Tutti i membri della famiglia vedono la stessa lista in tempo reale</div>
       </div>
       <div class="tutorial-buttons">
         <button class="btn-skip" onclick="skipTutorial()">Salta</button>
@@ -291,23 +302,15 @@
   <div id="family-login" class="family-login">
     <h2>👨‍👩‍👧‍👦 SmartSpesa</h2>
     <p class="subtitle">La spesa condivisa con la famiglia</p>
-    
-    <!-- BOX INFORMATIVO -->
     <div class="info-box">
       <p>📌 <strong>Come funziona?</strong><br>
       Inserisci il codice della tua famiglia qui sotto se ne possiedi già uno,<br>
       oppure clicca su <strong>"➕ Crea nuova famiglia"</strong> per generare un codice da condividere con i tuoi familiari.</p>
     </div>
-    
     <input type="text" id="family-code-input" placeholder="Codice famiglia (es. ABC123)" maxlength="10" style="text-transform:uppercase">
     <button onclick="accediFamiglia()">🔑 Accedi con questo codice</button>
-    
-    <div class="divider">
-      <span>oppure</span>
-    </div>
-    
+    <div class="divider"><span>oppure</span></div>
     <button onclick="mostraCreaFamiglia()" class="btn-secondary">➕ Crea nuova famiglia</button>
-    
     <div id="crea-famiglia-section" style="display:none; margin-top:20px;">
       <hr style="margin:15px 0;">
       <p style="text-align:center; margin-bottom:10px;">🏠 <strong>Crea una nuova famiglia</strong></p>
@@ -408,6 +411,7 @@
           <input type="password" id="app-password" placeholder="Password">
           <input type="url" id="app-link" placeholder="Link sito web">
           <button class="btn-salva" onclick="salvaAppBuono()">Aggiungi app</button>
+          <p style="font-size:0.7rem; color:#888; margin-top:8px;">💡 Dopo aver salvato, imposta il saldo iniziale e registra le spese</p>
         </div>
         <div id="lista-app" class="lista-app"></div>
       </div>
@@ -431,7 +435,7 @@
       <div class="lista-buoni" id="lista-buoni"></div>
     </div>
 
-    <!-- MODALE STORICO -->
+    <!-- MODALE STORICO (spostato fuori dalle pagine) -->
     <div id="storico-modal" class="storico-modal">
       <h3>📋 Storico spese</h3>
       <div id="storico-lista"></div>
@@ -473,7 +477,6 @@
         document.getElementById('tutorial-step-num').textContent = `Passo ${tutorialStep}/4`;
         document.getElementById('tutorial-title').textContent = stepData.title;
         document.getElementById('tutorial-content').innerHTML = stepData.content;
-        
         if (tutorialStep > 1 && !document.querySelector('.btn-prev')) {
           const btns = document.querySelector('.tutorial-buttons');
           const skipBtn = btns.querySelector('.btn-skip');
@@ -483,21 +486,14 @@
           prevBtnNew.onclick = prevTutorial;
           btns.insertBefore(prevBtnNew, skipBtn);
         }
-        if (tutorialStep === 1 && document.querySelector('.btn-prev')) {
-          document.querySelector('.btn-prev').remove();
-        }
+        if (tutorialStep === 1 && document.querySelector('.btn-prev')) document.querySelector('.btn-prev').remove();
       }
     }
-    
     function nextTutorial() { if (tutorialStep < 4) { tutorialStep++; showTutorialStep(); } else { skipTutorial(); } }
     function prevTutorial() { if (tutorialStep > 1) { tutorialStep--; showTutorialStep(); } }
     function skipTutorial() { localStorage.setItem('smartspesa_tutorial_seen', 'true'); document.getElementById('tutorial-overlay').classList.add('hidden'); }
-    
-    if (!localStorage.getItem('smartspesa_tutorial_seen')) {
-      document.getElementById('tutorial-overlay').classList.remove('hidden');
-    } else {
-      document.getElementById('tutorial-overlay').classList.add('hidden');
-    }
+    if (!localStorage.getItem('smartspesa_tutorial_seen')) document.getElementById('tutorial-overlay').classList.remove('hidden');
+    else document.getElementById('tutorial-overlay').classList.add('hidden');
     
     // ============================================================
     // CONFIGURAZIONE FIREBASE
@@ -517,10 +513,7 @@
     let currentFamilyName = null;
     let ignoreSync = false;
     
-    try {
-      firebase.initializeApp(firebaseConfig);
-      db = firebase.database();
-    } catch(e) { console.error('Errore Firebase:', e); }
+    try { firebase.initializeApp(firebaseConfig); db = firebase.database(); } catch(e) { console.error('Errore Firebase:', e); }
     
     // DATI GLOBALI
     let prodotti = [];
@@ -554,26 +547,20 @@
       const nome = document.getElementById('new-family-name').value.trim();
       if (!nome) { alert('Inserisci un nome per la famiglia'); return; }
       const codice = generaCodiceFamiglia();
-      const famiglia = { nome: nome, codice: codice, dataCreazione: new Date().toISOString() };
-      db.ref('famiglie/' + codice).set(famiglia).then(() => {
+      db.ref('famiglie/' + codice).set({ nome: nome, codice: codice, dataCreazione: new Date().toISOString() }).then(() => {
         localStorage.setItem('smartspesa_family', codice);
         localStorage.setItem('smartspesa_family_name', nome);
         currentFamilyCode = codice;
         currentFamilyName = nome;
         document.getElementById('family-login').classList.add('hidden');
         document.getElementById('app-content').style.display = 'block';
-        document.getElementById('family-name-display').innerHTML = `🏠 ${nome} | <span style="font-family:monospace">Codice: ${codice}</span> <button class="btn-copy" style="font-size:0.7rem; padding:4px 8px; margin-left:8px;" onclick="copiaCodice()">📋 Copia</button>`;
+        document.getElementById('family-name-display').innerHTML = `🏠 ${nome} | <span style="font-family:monospace">Codice: ${codice}</span> <button class="btn-copy" onclick="copiaCodice()">📋 Copia</button>`;
         caricaDatiFamiglia();
         showToast(`✅ Famiglia "${nome}" creata! Codice: ${codice}`);
       });
     }
     
-    function copiaCodice() {
-      if (currentFamilyCode) {
-        navigator.clipboard.writeText(currentFamilyCode);
-        showToast('📋 Codice copiato! Condividilo con i familiari');
-      }
-    }
+    function copiaCodice() { if (currentFamilyCode) { navigator.clipboard.writeText(currentFamilyCode); showToast('📋 Codice copiato!'); } }
     
     function accediFamiglia() {
       const codice = document.getElementById('family-code-input').value.trim().toUpperCase();
@@ -629,13 +616,15 @@
           currentFamilyName = localStorage.getItem('smartspesa_family_name');
           document.getElementById('family-login').classList.add('hidden');
           document.getElementById('app-content').style.display = 'block';
-          document.getElementById('family-name-display').innerHTML = `🏠 ${currentFamilyName} | <span style="font-family:monospace">Codice: ${currentFamilyCode}</span> <button class="btn-copy" style="font-size:0.7rem; padding:4px 8px; margin-left:8px;" onclick="copiaCodice()">📋 Copia</button>`;
+          document.getElementById('family-name-display').innerHTML = `🏠 ${currentFamilyName} | <span style="font-family:monospace">Codice: ${currentFamilyCode}</span> <button class="btn-copy" onclick="copiaCodice()">📋 Copia</button>`;
           caricaDatiFamiglia();
         } else { localStorage.removeItem('smartspesa_family'); localStorage.removeItem('smartspesa_family_name'); }
       });
     }
     
-    // FUNZIONI APP
+    // ============================================================
+    // FUNZIONI LISTA SPESA
+    // ============================================================
     function aggiungiProdotto() {
       const nome = document.getElementById('campo-input').value.trim();
       if (!nome) return;
@@ -646,10 +635,11 @@
     }
     
     function toggleFatto(id) { const p = prodotti.find(p => p.id === id); if (p) p.fatto = !p.fatto; renderLista(); aggiornaContatori(); salvaDatiFamiglia(); }
-    function cambiaQuantita(id, delta) { const p = prodotti.find(p => p.id === id); if (p) p.quantita = Math.max(1, p.quantita + delta); renderLista(); salvaDatiFamiglia(); }
+    function cambiaQuantita(id, delta) { const p = prodotti.find(p => p.id === id); if (p) { p.quantita = Math.max(1, p.quantita + delta); } renderLista(); salvaDatiFamiglia(); }
     function eliminaProdotto(id) { prodotti = prodotti.filter(p => p.id !== id); renderLista(); aggiornaContatori(); salvaDatiFamiglia(); }
     function pulisciCompletati() { prodotti = prodotti.filter(p => !p.fatto); renderLista(); aggiornaContatori(); salvaDatiFamiglia(); showToast('✓ Prodotti presi rimossi'); }
     function setFiltro(tipo, btn) { filtroAttivo = tipo; document.querySelectorAll('.filtro').forEach(b => b.classList.remove('attivo')); btn.classList.add('attivo'); renderLista(); }
+    
     function renderLista() {
       let lista = prodotti;
       if (filtroAttivo === 'mancano') lista = prodotti.filter(p => !p.fatto);
@@ -659,8 +649,11 @@
       container.innerHTML = lista.map(p => `<div class="elemento ${p.fatto ? 'fatto' : ''}"><div class="check-box ${p.fatto ? 'checked' : ''}" onclick="toggleFatto(${p.id})">${p.fatto ? '✓' : ''}</div><span class="testo">${escapeHtml(p.nome)}</span><div class="quantita"><button class="btn-q" onclick="cambiaQuantita(${p.id}, -1)">−</button><span class="num-q">${p.quantita}</span><button class="btn-q" onclick="cambiaQuantita(${p.id}, 1)">+</button></div><button class="btn-elimina" onclick="eliminaProdotto(${p.id})">✕</button></div>`).join('');
     }
     function aggiornaContatori() { document.getElementById('tot').textContent = prodotti.length; const presi = prodotti.filter(p => p.fatto).length; document.getElementById('presi').textContent = presi; document.getElementById('mancano').textContent = prodotti.length - presi; }
-    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m); }
     
+    // ============================================================
+    // FUNZIONI CARTE FEDELTÀ
+    // ============================================================
     function salvaCarta() {
       const nome = document.getElementById('carta-nome').value.trim();
       const codice = document.getElementById('carta-codice').value.trim();
@@ -676,34 +669,211 @@
       container.innerHTML = carte.map(c => `<div class="carta"><div class="carta-info"><div class="carta-nome">${escapeHtml(c.nome)}</div><div class="carta-codice">${c.codice}</div></div><div class="carta-azioni"><button class="btn-mostra" onclick="mostraModale('${escapeHtml(c.nome)}', '${c.codice}')">Mostra</button><button class="btn-elimina-carta" onclick="eliminaCarta(${c.id})">✕</button></div></div>`).join('');
     }
     
-    function salvaAppBuono() { showToast('Funzionalità in sviluppo'); }
-    function renderAppsBuoni() { document.getElementById('lista-app').innerHTML = '<p style="text-align:center;color:#aaa;padding:20px">Nessuna app salvata</p>'; }
-    function salvaBuono() { showToast('Funzionalità in sviluppo'); }
-    function renderBuoni() { document.getElementById('lista-buoni').innerHTML = '<p style="text-align:center;color:#aaa;padding:20px">Nessun buono salvato</p>'; }
+    // ============================================================
+    // FUNZIONI APP BUONI PASTO (COMPLETE)
+    // ============================================================
+    function salvaAppBuono() {
+      const select = document.getElementById('app-seleziona');
+      let nomeApp = select.value;
+      const nomePersonalizzato = document.getElementById('app-nome-personalizzato').value.trim();
+      if (nomeApp === 'Altra' && nomePersonalizzato) nomeApp = nomePersonalizzato;
+      else if (nomeApp === 'Altra' && !nomePersonalizzato) { showToast('Inserisci il nome della tua app'); return; }
+      else if (nomeApp === '') { showToast('Seleziona un\'azienda dal menu'); return; }
+      const username = document.getElementById('app-username').value.trim();
+      const password = document.getElementById('app-password').value;
+      let link = document.getElementById('app-link').value.trim();
+      if (!username || !password) { showToast('Inserisci username e password'); return; }
+      if (link && !link.startsWith('http')) link = 'https://' + link;
+      const nuovaApp = { id: Date.now(), nome: nomeApp, username: username, password: btoa(password), link: link, saldoIniziale: null, saldoResiduo: null, speseTotali: 0, dataInserimento: new Date().toLocaleString() };
+      appsBuoni.push(nuovaApp);
+      document.getElementById('app-seleziona').value = ''; document.getElementById('app-nome-personalizzato').value = '';
+      document.getElementById('app-username').value = ''; document.getElementById('app-password').value = '';
+      document.getElementById('app-link').value = ''; document.getElementById('app-nome-personalizzato').style.display = 'none';
+      renderAppsBuoni(); salvaDatiFamiglia(); showToast(`✓ App ${nomeApp} salvata!`);
+    }
     
-    function vaiA(pagina) { document.querySelectorAll('.pagina').forEach(p => p.classList.remove('attiva')); document.getElementById('pagina-' + pagina).classList.add('attiva'); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('attivo')); document.getElementById('nav-' + pagina).classList.add('attivo'); }
-    async function avviaFotocamera(modalita) { showToast('Fotocamera avviata'); }
-    function stopFotocamera(modalita) { }
-    async function cercaBarcode() { showToast('Cerca barcode'); }
-    function mostraModale(nome, codice) { JsBarcode('#modale-barcode', codice, { format: 'CODE128', width: 2, height: 80, displayValue: false }); document.getElementById('modale').classList.add('aperta'); document.getElementById('modale-nome').textContent = nome; document.getElementById('modale-codice').textContent = codice; }
-    function chiudiModale() { document.getElementById('modale').classList.remove('aperta'); }
+    function getDecodedPassword(encoded) { try { return atob(encoded); } catch(e) { return encoded; } }
+    
+    function impostaSaldoIniziale(id) {
+      const app = appsBuoni.find(a => a.id === id);
+      if (!app) return;
+      const saldo = prompt('Inserisci il saldo iniziale dei buoni pasto (€):', app.saldoIniziale || '');
+      if (saldo !== null && !isNaN(parseFloat(saldo))) {
+        app.saldoIniziale = parseFloat(saldo);
+        app.saldoResiduo = parseFloat(saldo);
+        app.speseTotali = 0;
+        renderAppsBuoni(); salvaDatiFamiglia();
+        showToast(`✓ Saldo iniziale impostato: €${saldo}`);
+      } else if (saldo !== null) showToast('Inserisci un numero valido');
+    }
+    
+    function registraSpesa(id) {
+      const app = appsBuoni.find(a => a.id === id);
+      if (!app) return;
+      if (app.saldoResiduo === null) { showToast('Prima imposta il saldo iniziale!'); return; }
+      const valore = prompt('Inserisci l\'importo speso (€):', '');
+      if (valore !== null && !isNaN(parseFloat(valore))) {
+        const spesa = parseFloat(valore);
+        if (spesa > app.saldoResiduo) { showToast(`⚠️ Saldo insufficiente! Residuo: €${app.saldoResiduo.toFixed(2)}`); return; }
+        app.saldoResiduo -= spesa;
+        app.speseTotali += spesa;
+        if (!storicoSpese[id]) storicoSpese[id] = [];
+        const descrizione = prompt('Descrizione (opzionale):', 'Acquisto') || 'Acquisto';
+        storicoSpese[id].push({ data: new Date().toLocaleString(), importo: spesa, descrizione: descrizione });
+        renderAppsBuoni(); salvaDatiFamiglia();
+        showToast(`✓ Spesa registrata: €${spesa.toFixed(2)} - Residuo: €${app.saldoResiduo.toFixed(2)}`);
+      }
+    }
+    
+    function mostraStorico(id) {
+      const app = appsBuoni.find(a => a.id === id);
+      if (!app) return;
+      const storico = storicoSpese[id] || [];
+      const modal = document.getElementById('storico-modal');
+      const listaDiv = document.getElementById('storico-lista');
+      if (storico.length === 0) listaDiv.innerHTML = '<p>Nessuna spesa registrata</p>';
+      else {
+        listaDiv.innerHTML = `<ul>${storico.map(s => `<li><strong>${s.data}</strong><br>💸 €${s.importo.toFixed(2)} - ${escapeHtml(s.descrizione)}</li>`).join('')}</ul><p style="margin-top:10px; font-weight:bold;">Totale speso: €${app.speseTotali.toFixed(2)}</p><p style="font-weight:bold; color:#2D6A4F;">Residuo: €${(app.saldoResiduo || 0).toFixed(2)}</p>`;
+      }
+      modal.classList.add('active');
+    }
+    
     function chiudiStorico() { document.getElementById('storico-modal').classList.remove('active'); }
-    function apriLink(link) { window.open(link, '_blank'); }
-    function togglePasswordVisibility(id) { }
+    
+    function eliminaAppBuono(id) {
+      if (confirm('Eliminare questa app? Tutti i dati di saldo e storico verranno persi.')) {
+        appsBuoni = appsBuoni.filter(a => a.id !== id);
+        delete storicoSpese[id];
+        renderAppsBuoni(); salvaDatiFamiglia();
+        showToast('✓ App eliminata');
+      }
+    }
+    
+    function togglePasswordVisibility(id) {
+      const span = document.getElementById(`password-${id}`);
+      if (span) span.style.display = span.style.display === 'none' ? 'inline' : 'none';
+    }
+    
+    function apriLink(link) { if (link) window.open(link, '_blank'); else showToast('Nessun link disponibile'); }
+    
+    function renderAppsBuoni() {
+      const container = document.getElementById('lista-app');
+      if (!appsBuoni.length) { container.innerHTML = '<p style="text-align:center;color:#aaa;padding:20px">Nessuna app salvata</p>'; return; }
+      container.innerHTML = appsBuoni.map(app => {
+        const decoded = getDecodedPassword(app.password);
+        const masked = '•'.repeat(Math.min(decoded.length, 8));
+        const saldoMostrato = app.saldoResiduo !== null ? `€${app.saldoResiduo.toFixed(2)}` : 'Non impostato';
+        return `<div class="app-buono-card"><div class="app-info"><div class="app-nome">${escapeHtml(app.nome)}</div><div class="app-crediti">👤 ${escapeHtml(app.username)}<br>🔒 ${masked}<button class="mostra-password" onclick="togglePasswordVisibility(${app.id})">👁️</button><span id="password-${app.id}" style="display:none;"> (${decoded})</span></div><div class="app-saldo">💰 Saldo residuo: ${saldoMostrato}</div>${app.speseTotali > 0 ? `<div class="app-spese">📉 Speso: €${app.speseTotali.toFixed(2)}</div>` : ''}${app.dataInserimento ? `<div class="app-crediti">📅 ${app.dataInserimento}</div>` : ''}</div><div class="app-azioni">${app.link ? `<button class="btn-apri-app" onclick="apriLink('${app.link}')">🌐 Apri sito</button>` : ''}<button class="btn-saldo-iniziale" onclick="impostaSaldoIniziale(${app.id})">💰 Imposta saldo</button><button class="btn-usa-buono" onclick="registraSpesa(${app.id})">💸 Usa buono</button><button class="btn-storico" onclick="mostraStorico(${app.id})">📋 Storico</button><button class="btn-elimina-carta" onclick="eliminaAppBuono(${app.id})">✕</button></div></div>`;
+      }).join('');
+    }
+    
+    // BUONI FISICI
+    function salvaBuono() {
+      const nome = document.getElementById('buono-nome').value.trim();
+      const codice = document.getElementById('buono-codice').value.trim();
+      if (!nome || !codice) { showToast('Inserisci nome e codice'); return; }
+      buoni.push({ id: Date.now(), nome: nome, codice: codice });
+      document.getElementById('buono-nome').value = ''; document.getElementById('buono-codice').value = '';
+      renderBuoni(); salvaDatiFamiglia(); showToast(`✓ Buono ${nome} salvato`);
+    }
+    function eliminaBuono(id) { buoni = buoni.filter(b => b.id !== id); renderBuoni(); salvaDatiFamiglia(); showToast('✓ Buono eliminato'); }
+    function renderBuoni() {
+      const container = document.getElementById('lista-buoni');
+      if (!buoni.length) { container.innerHTML = '<p style="text-align:center;color:#aaa;padding:20px">Nessun buono salvato</p>'; return; }
+      container.innerHTML = buoni.map(b => `<div class="carta"><div class="carta-info"><div class="carta-nome">${escapeHtml(b.nome)}</div><div class="carta-codice">${b.codice}</div></div><div class="carta-azioni"><button class="btn-mostra" onclick="mostraModale('${escapeHtml(b.nome)}', '${b.codice}')">Mostra</button><button class="btn-elimina-carta" onclick="eliminaBuono(${b.id})">✕</button></div></div>`).join('');
+    }
+    
+    // FOTOCAMERA E NAVIGAZIONE
+    function vaiA(pagina) {
+      document.querySelectorAll('.pagina').forEach(p => p.classList.remove('attiva'));
+      document.getElementById('pagina-' + pagina).classList.add('attiva');
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('attivo'));
+      document.getElementById('nav-' + pagina).classList.add('attivo');
+      stopTutteFotocamere();
+    }
+    
+    function stopTutteFotocamere() {
+      if (scannerAttivo) { scannerAttivo.stop().catch(e => console.log(e)); scannerAttivo = null; }
+      document.querySelectorAll('.scanner-container').forEach(c => c.style.display = 'none');
+      modalitaCorrente = null;
+    }
+    
+    async function avviaFotocamera(modalita) {
+      stopTutteFotocamere();
+      const containerId = `scanner-container-${modalita}`;
+      const readerId = `reader-${modalita}`;
+      const container = document.getElementById(containerId);
+      if (!container) { showToast('Errore'); return; }
+      try {
+        container.style.display = 'block';
+        modalitaCorrente = modalita;
+        const html5QrCode = new Html5Qrcode(readerId);
+        scannerAttivo = html5QrCode;
+        await html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 150 } }, (decodedText) => {
+          if (modalitaCorrente === modalita) {
+            if (modalita === 'spesa') { document.getElementById('campo-barcode').value = decodedText; stopTutteFotocamere(); cercaBarcode(); }
+            else if (modalita === 'carte') { document.getElementById('carta-codice').value = decodedText; stopTutteFotocamere(); showToast('✓ Codice acquisito'); }
+            else if (modalita === 'buoni') { document.getElementById('buono-codice').value = decodedText; stopTutteFotocamere(); showToast('✓ Codice acquisito'); }
+          }
+        }, (error) => {});
+      } catch (err) { showToast('Impossibile accedere alla fotocamera'); container.style.display = 'none'; }
+    }
+    
+    function stopFotocamera(modalita) {
+      if (scannerAttivo && modalitaCorrente === modalita) { scannerAttivo.stop().catch(e => console.log(e)); scannerAttivo = null; }
+      const container = document.getElementById(`scanner-container-${modalita}`);
+      if (container) container.style.display = 'none';
+      if (modalitaCorrente === modalita) modalitaCorrente = null;
+    }
+    
+    async function cercaBarcode() {
+      const input = document.getElementById('campo-barcode');
+      const codice = input.value.trim();
+      if (!codice) return;
+      const risultatoDiv = document.getElementById('risultato-barcode');
+      risultatoDiv.textContent = '🔍 Ricerca...';
+      try {
+        const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${codice}.json`);
+        const data = await res.json();
+        if (data.status === 1) {
+          const nome = data.product.product_name_it || data.product.product_name || data.product.brands || 'Prodotto';
+          risultatoDiv.textContent = `✓ Trovato: ${nome}`;
+          prodotti.unshift({ id: Date.now(), nome: nome, quantita: 1, fatto: false });
+          renderLista(); aggiornaContatori(); salvaDatiFamiglia();
+          input.value = ''; showToast(`✓ ${nome} aggiunto`);
+        } else { risultatoDiv.className = 'risultato-barcode errore'; risultatoDiv.textContent = '✕ Prodotto non trovato'; showToast('✕ Prodotto non trovato'); }
+      } catch (e) { risultatoDiv.className = 'risultato-barcode errore'; risultatoDiv.textContent = '✕ Errore di connessione'; showToast('✕ Errore di connessione'); }
+    }
+    
+    function mostraModale(nome, codice) {
+      document.getElementById('modale-nome').textContent = nome;
+      document.getElementById('modale-codice').textContent = codice;
+      JsBarcode('#modale-barcode', codice, { format: 'CODE128', width: 2, height: 80, displayValue: false });
+      document.getElementById('modale').classList.add('aperta');
+    }
+    function chiudiModale() { document.getElementById('modale').classList.remove('aperta'); }
+    
+    document.getElementById('app-seleziona')?.addEventListener('change', function() {
+      const personalizzato = document.getElementById('app-nome-personalizzato');
+      personalizzato.style.display = this.value === 'Altra' ? 'block' : 'none';
+      const opt = this.options[this.selectedIndex];
+      document.getElementById('app-link').value = opt.getAttribute('data-link') || '';
+    });
+    
+    document.getElementById('campo-input')?.addEventListener('keydown', e => e.key === 'Enter' && aggiungiProdotto());
+    document.getElementById('campo-barcode')?.addEventListener('keydown', e => e.key === 'Enter' && cercaBarcode());
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error:', err));
     
     window.avviaFotocamera = avviaFotocamera; window.stopFotocamera = stopFotocamera; window.cercaBarcode = cercaBarcode;
     window.aggiungiProdotto = aggiungiProdotto; window.toggleFatto = toggleFatto; window.cambiaQuantita = cambiaQuantita;
     window.eliminaProdotto = eliminaProdotto; window.pulisciCompletati = pulisciCompletati; window.setFiltro = setFiltro;
     window.salvaCarta = salvaCarta; window.eliminaCarta = eliminaCarta; window.salvaBuono = salvaBuono; window.eliminaBuono = eliminaBuono;
-    window.salvaAppBuono = salvaAppBuono; window.eliminaAppBuono = function(id) { showToast('Funzionalità in sviluppo'); };
-    window.impostaSaldoIniziale = function(id) { showToast('Funzionalità in sviluppo'); };
-    window.registraSpesa = function(id) { showToast('Funzionalità in sviluppo'); };
-    window.mostraStorico = function(id) { document.getElementById('storico-modal').classList.add('active'); };
-    window.chiudiStorico = chiudiStorico; window.apriLink = apriLink; window.togglePasswordVisibility = togglePasswordVisibility;
-    window.mostraModale = mostraModale; window.chiudiModale = chiudiModale; window.vaiA = vaiA;
-    window.accediFamiglia = accediFamiglia; window.creaNuovaFamiglia = creaNuovaFamiglia; window.mostraCreaFamiglia = mostraCreaFamiglia;
-    window.nascondiCreaFamiglia = nascondiCreaFamiglia; window.copiaCodice = copiaCodice; window.skipTutorial = skipTutorial;
-    window.nextTutorial = nextTutorial; window.prevTutorial = prevTutorial;
+    window.salvaAppBuono = salvaAppBuono; window.eliminaAppBuono = eliminaAppBuono; window.impostaSaldoIniziale = impostaSaldoIniziale;
+    window.registraSpesa = registraSpesa; window.mostraStorico = mostraStorico; window.chiudiStorico = chiudiStorico;
+    window.apriLink = apriLink; window.togglePasswordVisibility = togglePasswordVisibility; window.mostraModale = mostraModale;
+    window.chiudiModale = chiudiModale; window.vaiA = vaiA; window.accediFamiglia = accediFamiglia; window.creaNuovaFamiglia = creaNuovaFamiglia;
+    window.mostraCreaFamiglia = mostraCreaFamiglia; window.nascondiCreaFamiglia = nascondiCreaFamiglia; window.copiaCodice = copiaCodice;
+    window.skipTutorial = skipTutorial; window.nextTutorial = nextTutorial; window.prevTutorial = prevTutorial;
     
     renderLista(); aggiornaContatori(); renderCarte(); renderBuoni(); renderAppsBuoni();
   </script>
