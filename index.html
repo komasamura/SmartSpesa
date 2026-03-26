@@ -75,7 +75,7 @@
     .app-crediti { font-size: 0.7rem; color: #666; margin-top: 4px; }
     .app-saldo { font-size: 0.85rem; font-weight: 700; color: #2D6A4F; margin-top: 4px; }
     .btn-apri-app { background: #2D6A4F; color: white; text-decoration: none; padding: 6px 12px; border-radius: 30px; font-size: 0.75rem; display: inline-block; margin-right: 8px; }
-    .btn-aggiorna-saldo { background: #E9E6DF; border: none; border-radius: 30px; padding: 6px 12px; font-size: 0.7rem; cursor: pointer; }
+    .btn-visualizza-crediti { background: #E9E6DF; border: none; border-radius: 30px; padding: 6px 12px; font-size: 0.7rem; cursor: pointer; }
     .mostra-password { background: transparent; border: none; cursor: pointer; font-size: 1rem; margin-left: 5px; }
     .modale { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; gap: 24px; }
     .modale.aperta { display: flex; }
@@ -86,7 +86,6 @@
     .nav-btn .icona { font-size: 1.4rem; }
     .nav-btn.attivo { color: #2D6A4F; }
     
-    /* Toast per notifiche silenziose */
     .toast {
       position: fixed;
       bottom: 100px;
@@ -194,8 +193,9 @@
         <input type="text" id="app-nome-personalizzato" placeholder="Nome app" style="display:none;">
         <input type="text" id="app-username" placeholder="Username / Email">
         <input type="password" id="app-password" placeholder="Password">
-        <input type="url" id="app-link" placeholder="Link sito web">
+        <input type="url" id="app-link" placeholder="Link sito web (es. https://www.edenred.it)">
         <button class="btn-salva" onclick="salvaAppBuono()">Aggiungi app</button>
+        <p style="font-size:0.7rem; color:#888; margin-top:8px;">💡 Inserisci il link completo con https://</p>
       </div>
       <div id="lista-app" class="lista-app"></div>
     </div>
@@ -246,7 +246,7 @@
     let buoni = JSON.parse(localStorage.getItem('buoni')) || [];
     let appsBuoni = JSON.parse(localStorage.getItem('appsBuoni')) || [];
 
-    // Funzione per notifiche silenziose (senza URL)
+    // Funzione per notifiche silenziose
     function showToast(message) {
       const toast = document.createElement('div');
       toast.className = 'toast';
@@ -285,7 +285,7 @@
       document.getElementById('modale').classList.remove('aperta');
     }
 
-    // GESTIONE FOTOCAMERA CON HTML5-QRCODE
+    // GESTIONE FOTOCAMERA
     async function avviaFotocamera(modalita) {
       stopTutteFotocamere();
       
@@ -331,9 +331,7 @@
               }
             }
           },
-          (error) => {
-            // Silenzioso, non mostrare errori continui
-          }
+          (error) => {}
         );
         
       } catch (err) {
@@ -507,7 +505,7 @@
       `).join('');
     }
 
-    // APP BUONI
+    // APP BUONI - Versione corretta senza saldo casuale
     function salvaAppBuono() {
       const select = document.getElementById('app-seleziona');
       let nomeApp = select.value;
@@ -525,11 +523,16 @@
       
       const username = document.getElementById('app-username').value.trim();
       const password = document.getElementById('app-password').value;
-      const link = document.getElementById('app-link').value.trim();
+      let link = document.getElementById('app-link').value.trim();
       
       if (!username || !password) {
         showToast('Inserisci username e password');
         return;
+      }
+      
+      // Assicurati che il link inizi con https://
+      if (link && !link.startsWith('http')) {
+        link = 'https://' + link;
       }
       
       const nuovaApp = {
@@ -538,8 +541,7 @@
         username: username,
         password: btoa(password),
         link: link,
-        saldo: null,
-        ultimoAggiornamento: null
+        dataInserimento: new Date().toLocaleString()
       };
       
       appsBuoni.push(nuovaApp);
@@ -560,20 +562,12 @@
       try { return atob(encoded); } catch(e) { return encoded; }
     }
     
-    function aggiornaSaldoApp(id) {
+    // Funzione per visualizzare le credenziali (non più saldo casuale)
+    function visualizzaCredenziali(id) {
       const app = appsBuoni.find(a => a.id === id);
       if (!app) return;
-      const saldo = (Math.random() * 45 + 5).toFixed(2);
-      app.saldo = `€ ${saldo}`;
-      app.ultimoAggiornamento = new Date().toLocaleString();
-      localStorage.setItem('appsBuoni', JSON.stringify(appsBuoni));
-      renderAppsBuoni();
-      showToast(`✓ Saldo ${app.nome}: ${app.saldo}`);
-    }
-    
-    function togglePasswordVisibility(id) {
-      const span = document.getElementById(`password-${id}`);
-      if (span) span.style.display = span.style.display === 'none' ? 'inline' : 'none';
+      const decodedPassword = getDecodedPassword(app.password);
+      showToast(`🔐 ${app.username} / ${decodedPassword}`);
     }
     
     function eliminaAppBuono(id) {
@@ -581,6 +575,19 @@
       localStorage.setItem('appsBuoni', JSON.stringify(appsBuoni));
       renderAppsBuoni();
       showToast('✓ App eliminata');
+    }
+    
+    function togglePasswordVisibility(id) {
+      const span = document.getElementById(`password-${id}`);
+      if (span) span.style.display = span.style.display === 'none' ? 'inline' : 'none';
+    }
+    
+    function apriLink(link) {
+      if (!link) {
+        showToast('Nessun link disponibile');
+        return;
+      }
+      window.open(link, '_blank');
     }
     
     function renderAppsBuoni() {
@@ -602,12 +609,11 @@
               <button class="mostra-password" onclick="togglePasswordVisibility(${app.id})">👁️</button>
               <span id="password-${app.id}" style="display:none;"> (${decoded})</span>
             </div>
-            ${app.saldo ? `<div class="app-saldo">💰 ${app.saldo}</div>` : ''}
-            ${app.ultimoAggiornamento ? `<div class="app-crediti">🕐 ${app.ultimoAggiornamento}</div>` : ''}
+            ${app.dataInserimento ? `<div class="app-crediti">📅 ${app.dataInserimento}</div>` : ''}
           </div>
           <div class="carta-azioni">
-            ${app.link ? `<a class="btn-apri-app" href="${app.link}" target="_blank">Apri</a>` : ''}
-            <button class="btn-aggiorna-saldo" onclick="aggiornaSaldoApp(${app.id})">🔄</button>
+            ${app.link ? `<button class="btn-apri-app" onclick="apriLink('${app.link}')">Apri sito</button>` : ''}
+            <button class="btn-visualizza-crediti" onclick="visualizzaCredenziali(${app.id})">🔐 Credenziali</button>
             <button class="btn-elimina-carta" onclick="eliminaAppBuono(${app.id})">✕</button>
           </div>
         </div>
@@ -687,8 +693,9 @@
     window.eliminaBuono = eliminaBuono;
     window.salvaAppBuono = salvaAppBuono;
     window.eliminaAppBuono = eliminaAppBuono;
-    window.aggiornaSaldoApp = aggiornaSaldoApp;
+    window.visualizzaCredenziali = visualizzaCredenziali;
     window.togglePasswordVisibility = togglePasswordVisibility;
+    window.apriLink = apriLink;
     window.mostraModale = mostraModale;
     window.chiudiModale = chiudiModale;
     window.vaiA = vaiA;
