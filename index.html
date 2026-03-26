@@ -16,445 +16,95 @@
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      background: #F5F2EB;
-      max-width: 500px;
-      margin: 0 auto;
-      padding-bottom: 80px;
-      min-height: 100vh;
-    }
-
-    .pagina {
-      display: none;
-      padding: 32px 20px 20px;
-    }
-    .pagina.attiva {
-      display: block;
-    }
-
-    h1 {
-      font-size: 2rem;
-      font-weight: 800;
-      color: #1A2C2A;
-      line-height: 1.1;
-      margin-bottom: 6px;
-    }
-    h1 span {
-      color: #2D6A4F;
-    }
-    .sottotitolo {
-      font-size: 0.85rem;
-      color: #8B8A86;
-      margin-bottom: 28px;
-      border-left: 3px solid #2D6A4F;
-      padding-left: 10px;
-    }
-
-    .sezione {
-      background: white;
-      border-radius: 24px;
-      border: 1px solid #E9E6DF;
-      padding: 18px;
-      margin-bottom: 24px;
-    }
-    .sezione h2 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #2D6A4F;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .form-barcode {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
-    }
-    .form-barcode input {
-      flex: 2;
-      padding: 12px 14px;
-      border: 1.5px solid #E2DFD8;
-      border-radius: 18px;
-      font-size: 0.95rem;
-      background: #FEFEFC;
-    }
-    .form-barcode input:focus {
-      border-color: #2D6A4F;
-      outline: none;
-    }
-    .btn-cerca, .btn-fotocamera {
-      background: #2D6A4F;
-      border: none;
-      padding: 0 16px;
-      border-radius: 40px;
-      font-weight: 500;
-      color: white;
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
-    .btn-fotocamera {
-      background: #E9E6DF;
-      color: #2D6A4F;
-      border: 1px solid #D4D0C8;
-    }
-    .risultato-barcode {
-      font-size: 0.8rem;
-      margin-top: 8px;
-      color: #2C6E4F;
-      font-weight: 500;
-    }
+    /* TUTTO LO STILE INVARIATO */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: #F5F2EB; max-width: 500px; margin: 0 auto; padding-bottom: 80px; min-height: 100vh; }
+    .pagina { display: none; padding: 32px 20px 20px; }
+    .pagina.attiva { display: block; }
+    h1 { font-size: 2rem; font-weight: 800; color: #1A2C2A; line-height: 1.1; margin-bottom: 6px; }
+    h1 span { color: #2D6A4F; }
+    .sottotitolo { font-size: 0.85rem; color: #8B8A86; margin-bottom: 28px; border-left: 3px solid #2D6A4F; padding-left: 10px; }
+    .sezione { background: white; border-radius: 24px; border: 1px solid #E9E6DF; padding: 18px; margin-bottom: 24px; }
+    .sezione h2 { font-size: 1rem; font-weight: 600; color: #2D6A4F; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .form-barcode { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .form-barcode input { flex: 2; padding: 12px 14px; border: 1.5px solid #E2DFD8; border-radius: 18px; font-size: 0.95rem; background: #FEFEFC; }
+    .form-barcode input:focus { border-color: #2D6A4F; outline: none; }
+    .btn-cerca, .btn-fotocamera { background: #2D6A4F; border: none; padding: 0 16px; border-radius: 40px; font-weight: 500; color: white; cursor: pointer; font-size: 0.85rem; }
+    .btn-fotocamera { background: #E9E6DF; color: #2D6A4F; border: 1px solid #D4D0C8; }
+    .risultato-barcode { font-size: 0.8rem; margin-top: 8px; color: #2C6E4F; font-weight: 500; }
     .risultato-barcode.errore { color: #C33C2C; }
-
-    .scanner-container {
-      margin-top: 16px;
-      position: relative;
-      display: none;
-    }
-    .scanner-container video {
-      width: 100%;
-      border-radius: 20px;
-    }
-    .btn-stop {
-      background: #E63946;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 40px;
-      margin-top: 10px;
-      width: 100%;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .form-aggiunta {
-      display: flex;
-      gap: 10px;
-    }
-    .form-aggiunta input {
-      flex: 1;
-      padding: 14px 16px;
-      border: 1.5px solid #E2DFD8;
-      border-radius: 28px;
-      font-size: 1rem;
-    }
-    .btn-aggiungi {
-      background: #2D6A4F;
-      color: white;
-      border: none;
-      width: 52px;
-      border-radius: 40px;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-
-    .contatore {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-    .badge {
-      background: white;
-      border-radius: 40px;
-      padding: 6px 18px;
-      font-size: 0.8rem;
-      color: #5C5B57;
-      border: 1px solid #E2DFD8;
-    }
-    .badge strong {
-      color: #2D6A4F;
-    }
-
-    .filtri {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-    .filtro {
-      background: transparent;
-      border: 1px solid #D9D5CC;
-      border-radius: 30px;
-      padding: 6px 16px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      color: #6E6C66;
-    }
-    .filtro.attivo {
-      background: #2D6A4F;
-      border-color: #2D6A4F;
-      color: white;
-    }
-
-    .elemento {
-      background: white;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      margin-bottom: 10px;
-      border: 1px solid #EFECE6;
-    }
-    .elemento.fatto {
-      background: #F3F9F4;
-      opacity: 0.85;
-    }
-    .check-box {
-      width: 24px;
-      height: 24px;
-      border: 2px solid #D4D0C8;
-      border-radius: 10px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .check-box.checked {
-      background: #2D6A4F;
-      border-color: #2D6A4F;
-      color: white;
-    }
-    .testo {
-      flex: 1;
-      font-size: 1rem;
-      color: #1A2C2A;
-    }
-    .fatto .testo {
-      text-decoration: line-through;
-      color: #aaa;
-    }
-    .quantita {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-q {
-      width: 28px;
-      height: 28px;
-      border: 1px solid #E2DFD8;
-      background: white;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    .num-q {
-      min-width: 20px;
-      text-align: center;
-    }
-    .btn-elimina {
-      background: transparent;
-      border: none;
-      color: #bbb;
-      font-size: 1.2rem;
-      cursor: pointer;
-      padding: 4px;
-    }
-    .btn-elimina:hover {
-      color: #E63946;
-    }
-    .vuota {
-      text-align: center;
-      padding: 40px 0;
-      color: #aaa;
-    }
-    .footer {
-      margin-top: 16px;
-      display: flex;
-      justify-content: flex-end;
-    }
-    .btn-pulisci {
-      background: transparent;
-      border: 1px solid #E2DFD8;
-      border-radius: 30px;
-      padding: 8px 20px;
-      font-size: 0.8rem;
-      cursor: pointer;
-    }
-
-    .form-carta {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-    .form-carta input, .form-carta select {
-      padding: 12px 14px;
-      border: 1.5px solid #E2DFD8;
-      border-radius: 18px;
-      font-size: 0.95rem;
-    }
-    .btn-salva {
-      background: #2D6A4F;
-      color: white;
-      border: none;
-      border-radius: 40px;
-      padding: 12px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    .lista-carte, .lista-buoni, .lista-app {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .carta, .app-buono-card {
-      background: #FEFCF8;
-      border: 1px solid #E9E6DF;
-      border-radius: 20px;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .carta-info {
-      flex: 1;
-    }
-    .carta-nome {
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-    .carta-codice {
-      font-size: 0.7rem;
-      color: #888;
-      font-family: monospace;
-    }
-    .carta-azioni {
-      display: flex;
-      gap: 8px;
-    }
-    .btn-mostra {
-      background: #2D6A4F;
-      color: white;
-      border: none;
-      border-radius: 30px;
-      padding: 6px 14px;
-      cursor: pointer;
-      font-size: 0.75rem;
-    }
-    .btn-elimina-carta {
-      background: transparent;
-      border: 1px solid #E2DFD8;
-      border-radius: 30px;
-      padding: 6px 12px;
-      cursor: pointer;
-    }
-    .app-info {
-      flex: 1;
-    }
-    .app-nome {
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: #2D6A4F;
-    }
-    .app-crediti {
-      font-size: 0.7rem;
-      color: #666;
-      margin-top: 4px;
-    }
-    .app-saldo {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #2D6A4F;
-      margin-top: 4px;
-    }
-    .btn-apri-app {
-      background: #2D6A4F;
-      color: white;
-      text-decoration: none;
-      padding: 6px 12px;
-      border-radius: 30px;
-      font-size: 0.75rem;
-      display: inline-block;
-      margin-right: 8px;
-    }
-    .btn-aggiorna-saldo {
-      background: #E9E6DF;
-      border: none;
-      border-radius: 30px;
-      padding: 6px 12px;
-      font-size: 0.7rem;
-      cursor: pointer;
-    }
-    .mostra-password {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      font-size: 1rem;
-      margin-left: 5px;
-    }
-
-    .modale {
-      display: none;
+    .scanner-container { margin-top: 16px; position: relative; display: none; }
+    .scanner-container video { width: 100%; border-radius: 20px; }
+    .btn-stop { background: #E63946; color: white; border: none; padding: 10px; border-radius: 40px; margin-top: 10px; width: 100%; cursor: pointer; font-weight: bold; }
+    .form-aggiunta { display: flex; gap: 10px; }
+    .form-aggiunta input { flex: 1; padding: 14px 16px; border: 1.5px solid #E2DFD8; border-radius: 28px; font-size: 1rem; }
+    .btn-aggiungi { background: #2D6A4F; color: white; border: none; width: 52px; border-radius: 40px; font-size: 1.5rem; cursor: pointer; }
+    .contatore { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .badge { background: white; border-radius: 40px; padding: 6px 18px; font-size: 0.8rem; color: #5C5B57; border: 1px solid #E2DFD8; }
+    .badge strong { color: #2D6A4F; }
+    .filtri { display: flex; gap: 8px; margin-bottom: 20px; }
+    .filtro { background: transparent; border: 1px solid #D9D5CC; border-radius: 30px; padding: 6px 16px; font-size: 0.8rem; cursor: pointer; color: #6E6C66; }
+    .filtro.attivo { background: #2D6A4F; border-color: #2D6A4F; color: white; }
+    .elemento { background: white; border-radius: 20px; display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 10px; border: 1px solid #EFECE6; }
+    .elemento.fatto { background: #F3F9F4; opacity: 0.85; }
+    .check-box { width: 24px; height: 24px; border: 2px solid #D4D0C8; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .check-box.checked { background: #2D6A4F; border-color: #2D6A4F; color: white; }
+    .testo { flex: 1; font-size: 1rem; color: #1A2C2A; }
+    .fatto .testo { text-decoration: line-through; color: #aaa; }
+    .quantita { display: flex; align-items: center; gap: 6px; }
+    .btn-q { width: 28px; height: 28px; border: 1px solid #E2DFD8; background: white; border-radius: 10px; cursor: pointer; }
+    .num-q { min-width: 20px; text-align: center; }
+    .btn-elimina { background: transparent; border: none; color: #bbb; font-size: 1.2rem; cursor: pointer; padding: 4px; }
+    .btn-elimina:hover { color: #E63946; }
+    .vuota { text-align: center; padding: 40px 0; color: #aaa; }
+    .footer { margin-top: 16px; display: flex; justify-content: flex-end; }
+    .btn-pulisci { background: transparent; border: 1px solid #E2DFD8; border-radius: 30px; padding: 8px 20px; font-size: 0.8rem; cursor: pointer; }
+    .form-carta { display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; }
+    .form-carta input, .form-carta select { padding: 12px 14px; border: 1.5px solid #E2DFD8; border-radius: 18px; font-size: 0.95rem; }
+    .btn-salva { background: #2D6A4F; color: white; border: none; border-radius: 40px; padding: 12px; cursor: pointer; font-weight: 600; }
+    .lista-carte, .lista-buoni, .lista-app { display: flex; flex-direction: column; gap: 10px; }
+    .carta, .app-buono-card { background: #FEFCF8; border: 1px solid #E9E6DF; border-radius: 20px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; }
+    .carta-info { flex: 1; }
+    .carta-nome { font-weight: 600; font-size: 0.95rem; }
+    .carta-codice { font-size: 0.7rem; color: #888; font-family: monospace; }
+    .carta-azioni { display: flex; gap: 8px; }
+    .btn-mostra { background: #2D6A4F; color: white; border: none; border-radius: 30px; padding: 6px 14px; cursor: pointer; font-size: 0.75rem; }
+    .btn-elimina-carta { background: transparent; border: 1px solid #E2DFD8; border-radius: 30px; padding: 6px 12px; cursor: pointer; }
+    .app-info { flex: 1; }
+    .app-nome { font-weight: 600; font-size: 0.95rem; color: #2D6A4F; }
+    .app-crediti { font-size: 0.7rem; color: #666; margin-top: 4px; }
+    .app-saldo { font-size: 0.85rem; font-weight: 700; color: #2D6A4F; margin-top: 4px; }
+    .btn-apri-app { background: #2D6A4F; color: white; text-decoration: none; padding: 6px 12px; border-radius: 30px; font-size: 0.75rem; display: inline-block; margin-right: 8px; }
+    .btn-aggiorna-saldo { background: #E9E6DF; border: none; border-radius: 30px; padding: 6px 12px; font-size: 0.7rem; cursor: pointer; }
+    .mostra-password { background: transparent; border: none; cursor: pointer; font-size: 1rem; margin-left: 5px; }
+    .modale { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; gap: 24px; }
+    .modale.aperta { display: flex; }
+    .modale-barcode-box { background: white; padding: 20px; border-radius: 20px; text-align: center; }
+    .btn-chiudi-modale { background: transparent; border: 2px solid white; color: white; padding: 10px 24px; border-radius: 40px; cursor: pointer; }
+    .navbar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: white; border-top: 1px solid #E9E6DF; display: flex; z-index: 100; }
+    .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0; background: transparent; border: none; cursor: pointer; color: #aaa; font-size: 0.7rem; gap: 4px; }
+    .nav-btn .icona { font-size: 1.4rem; }
+    .nav-btn.attivo { color: #2D6A4F; }
+    
+    /* Toast per notifiche silenziose */
+    .toast {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.9);
-      z-index: 1000;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 24px;
-    }
-    .modale.aperta {
-      display: flex;
-    }
-    .modale-barcode-box {
-      background: white;
-      padding: 20px;
-      border-radius: 20px;
-      text-align: center;
-    }
-    .btn-chiudi-modale {
-      background: transparent;
-      border: 2px solid white;
-      color: white;
-      padding: 10px 24px;
-      border-radius: 40px;
-      cursor: pointer;
-    }
-
-    .navbar {
-      position: fixed;
-      bottom: 0;
+      bottom: 100px;
       left: 50%;
       transform: translateX(-50%);
-      width: 100%;
-      max-width: 500px;
-      background: white;
-      border-top: 1px solid #E9E6DF;
-      display: flex;
-      z-index: 100;
+      background: #2D6A4F;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      z-index: 1000;
+      animation: fadeOut 2s ease forwards;
+      pointer-events: none;
     }
-    .nav-btn {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 10px 0;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      color: #aaa;
-      font-size: 0.7rem;
-      gap: 4px;
-    }
-    .nav-btn .icona {
-      font-size: 1.4rem;
-    }
-    .nav-btn.attivo {
-      color: #2D6A4F;
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      70% { opacity: 1; }
+      100% { opacity: 0; visibility: hidden; }
     }
   </style>
 </head>
@@ -596,6 +246,15 @@
     let buoni = JSON.parse(localStorage.getItem('buoni')) || [];
     let appsBuoni = JSON.parse(localStorage.getItem('appsBuoni')) || [];
 
+    // Funzione per notifiche silenziose (senza URL)
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2000);
+    }
+
     // NAVIGAZIONE
     function vaiA(pagina) {
       document.querySelectorAll('.pagina').forEach(p => p.classList.remove('attiva'));
@@ -635,7 +294,7 @@
       const container = document.getElementById(containerId);
       
       if (!container) {
-        alert('Errore: componente non trovato');
+        showToast('Errore: componente non trovato');
         return;
       }
 
@@ -664,22 +323,22 @@
               } else if (modalita === 'carte') {
                 document.getElementById('carta-codice').value = decodedText;
                 stopTutteFotocamere();
-                alert('✅ Codice acquisito: ' + decodedText);
+                showToast('✓ Codice acquisito');
               } else if (modalita === 'buoni') {
                 document.getElementById('buono-codice').value = decodedText;
                 stopTutteFotocamere();
-                alert('✅ Codice acquisito: ' + decodedText);
+                showToast('✓ Codice acquisito');
               }
             }
           },
           (error) => {
-            console.log('Errore scansione:', error);
+            // Silenzioso, non mostrare errori continui
           }
         );
         
       } catch (err) {
         console.error('Errore fotocamera:', err);
-        alert('Impossibile accedere alla fotocamera.\n\nAssicurati di aver dato il permesso.');
+        showToast('Impossibile accedere alla fotocamera');
         container.style.display = 'none';
       }
     }
@@ -711,13 +370,16 @@
           renderLista();
           aggiornaContatori();
           input.value = '';
+          showToast(`✓ ${nome} aggiunto`);
         } else {
           risultatoDiv.className = 'risultato-barcode errore';
-          risultatoDiv.textContent = '✕ Prodotto non trovato. Aggiungi manualmente.';
+          risultatoDiv.textContent = '✕ Prodotto non trovato';
+          showToast('✕ Prodotto non trovato');
         }
       } catch (e) {
         risultatoDiv.className = 'risultato-barcode errore';
         risultatoDiv.textContent = '✕ Errore di connessione';
+        showToast('✕ Errore di connessione');
       }
     }
 
@@ -729,6 +391,7 @@
       document.getElementById('campo-input').value = '';
       renderLista();
       aggiornaContatori();
+      showToast(`✓ ${nome} aggiunto`);
     }
     
     function toggleFatto(id) {
@@ -754,6 +417,7 @@
       prodotti = prodotti.filter(p => !p.fatto);
       renderLista();
       aggiornaContatori();
+      showToast('✓ Prodotti presi rimossi');
     }
     
     function setFiltro(tipo, btn) {
@@ -807,18 +471,20 @@
     function salvaCarta() {
       const nome = document.getElementById('carta-nome').value.trim();
       const codice = document.getElementById('carta-codice').value.trim();
-      if (!nome || !codice) { alert('Inserisci nome e codice'); return; }
+      if (!nome || !codice) { showToast('Inserisci nome e codice'); return; }
       carte.push({ id: Date.now(), nome: nome, codice: codice });
       localStorage.setItem('carte', JSON.stringify(carte));
       document.getElementById('carta-nome').value = '';
       document.getElementById('carta-codice').value = '';
       renderCarte();
+      showToast(`✓ Carta ${nome} salvata`);
     }
     
     function eliminaCarta(id) {
       carte = carte.filter(c => c.id !== id);
       localStorage.setItem('carte', JSON.stringify(carte));
       renderCarte();
+      showToast('✓ Carta eliminata');
     }
     
     function renderCarte() {
@@ -850,10 +516,10 @@
       if (nomeApp === 'Altra' && nomePersonalizzato) {
         nomeApp = nomePersonalizzato;
       } else if (nomeApp === 'Altra' && !nomePersonalizzato) {
-        alert('Inserisci il nome della tua app!');
+        showToast('Inserisci il nome della tua app');
         return;
       } else if (nomeApp === '') {
-        alert('Seleziona un\'azienda dal menu!');
+        showToast('Seleziona un\'azienda dal menu');
         return;
       }
       
@@ -862,7 +528,7 @@
       const link = document.getElementById('app-link').value.trim();
       
       if (!username || !password) {
-        alert('Inserisci username e password');
+        showToast('Inserisci username e password');
         return;
       }
       
@@ -887,7 +553,7 @@
       document.getElementById('app-nome-personalizzato').style.display = 'none';
       
       renderAppsBuoni();
-      alert(`App "${nomeApp}" salvata!`);
+      showToast(`✓ App ${nomeApp} salvata`);
     }
     
     function getDecodedPassword(encoded) {
@@ -902,7 +568,7 @@
       app.ultimoAggiornamento = new Date().toLocaleString();
       localStorage.setItem('appsBuoni', JSON.stringify(appsBuoni));
       renderAppsBuoni();
-      alert(`Saldo ${app.nome}: ${app.saldo}`);
+      showToast(`✓ Saldo ${app.nome}: ${app.saldo}`);
     }
     
     function togglePasswordVisibility(id) {
@@ -911,11 +577,10 @@
     }
     
     function eliminaAppBuono(id) {
-      if (confirm('Eliminare questa app?')) {
-        appsBuoni = appsBuoni.filter(a => a.id !== id);
-        localStorage.setItem('appsBuoni', JSON.stringify(appsBuoni));
-        renderAppsBuoni();
-      }
+      appsBuoni = appsBuoni.filter(a => a.id !== id);
+      localStorage.setItem('appsBuoni', JSON.stringify(appsBuoni));
+      renderAppsBuoni();
+      showToast('✓ App eliminata');
     }
     
     function renderAppsBuoni() {
@@ -953,18 +618,20 @@
     function salvaBuono() {
       const nome = document.getElementById('buono-nome').value.trim();
       const codice = document.getElementById('buono-codice').value.trim();
-      if (!nome || !codice) { alert('Inserisci nome e codice'); return; }
+      if (!nome || !codice) { showToast('Inserisci nome e codice'); return; }
       buoni.push({ id: Date.now(), nome: nome, codice: codice });
       localStorage.setItem('buoni', JSON.stringify(buoni));
       document.getElementById('buono-nome').value = '';
       document.getElementById('buono-codice').value = '';
       renderBuoni();
+      showToast(`✓ Buono ${nome} salvato`);
     }
     
     function eliminaBuono(id) {
       buoni = buoni.filter(b => b.id !== id);
       localStorage.setItem('buoni', JSON.stringify(buoni));
       renderBuoni();
+      showToast('✓ Buono eliminato');
     }
     
     function renderBuoni() {
