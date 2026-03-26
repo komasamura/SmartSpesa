@@ -181,7 +181,7 @@
         <input type="text" id="app-nome-personalizzato" placeholder="Nome app" style="display:none;">
         <input type="text" id="app-username" placeholder="Username / Email">
         <input type="password" id="app-password" placeholder="Password">
-        <input type="url" id="app-link" placeholder="Link sito web (es. https://www.edenred.it)">
+        <input type="url" id="app-link" placeholder="Link sito web">
         <button class="btn-salva" onclick="salvaAppBuono()">Aggiungi app</button>
         <p style="font-size:0.7rem; color:#888; margin-top:8px;">💡 Dopo aver salvato, imposta il saldo iniziale e registra le spese</p>
       </div>
@@ -231,16 +231,19 @@
   </nav>
 
   <script>
-    // DATI
+    // DATI GLOBALI
     let prodotti = [];
     let filtroAttivo = 'tutti';
     let scannerAttivo = null;
     let modalitaCorrente = null;
 
+    // Inizializza i dati dal localStorage
     let carte = JSON.parse(localStorage.getItem('carte')) || [];
     let buoni = JSON.parse(localStorage.getItem('buoni')) || [];
     let appsBuoni = JSON.parse(localStorage.getItem('appsBuoni')) || [];
     let storicoSpese = JSON.parse(localStorage.getItem('storicoSpese')) || {};
+
+    console.log('Apps caricate:', appsBuoni); // Debug
 
     function showToast(message) {
       const toast = document.createElement('div');
@@ -250,6 +253,7 @@
       setTimeout(() => toast.remove(), 2000);
     }
 
+    // NAVIGAZIONE
     function vaiA(pagina) {
       document.querySelectorAll('.pagina').forEach(p => p.classList.remove('attiva'));
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('attivo'));
@@ -267,6 +271,7 @@
       modalitaCorrente = null;
     }
 
+    // MODALE BARCODE
     function mostraModale(nome, codice) {
       document.getElementById('modale-nome').textContent = nome;
       document.getElementById('modale-codice').textContent = codice;
@@ -278,6 +283,7 @@
       document.getElementById('modale').classList.remove('aperta');
     }
 
+    // GESTIONE FOTOCAMERA (semplificata)
     async function avviaFotocamera(modalita) {
       stopTutteFotocamere();
       const containerId = `scanner-container-${modalita}`;
@@ -289,24 +295,28 @@
         modalitaCorrente = modalita;
         const html5QrCode = new Html5Qrcode(readerId);
         scannerAttivo = html5QrCode;
-        const config = { fps: 10, qrbox: { width: 250, height: 150 }, aspectRatio: 1.0 };
-        await html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
-          if (modalitaCorrente === modalita) {
-            if (modalita === 'spesa') {
-              document.getElementById('campo-barcode').value = decodedText;
-              stopTutteFotocamere();
-              cercaBarcode();
-            } else if (modalita === 'carte') {
-              document.getElementById('carta-codice').value = decodedText;
-              stopTutteFotocamere();
-              showToast('✓ Codice acquisito');
-            } else if (modalita === 'buoni') {
-              document.getElementById('buono-codice').value = decodedText;
-              stopTutteFotocamere();
-              showToast('✓ Codice acquisito');
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: { width: 250, height: 150 } },
+          (decodedText) => {
+            if (modalitaCorrente === modalita) {
+              if (modalita === 'spesa') {
+                document.getElementById('campo-barcode').value = decodedText;
+                stopTutteFotocamere();
+                cercaBarcode();
+              } else if (modalita === 'carte') {
+                document.getElementById('carta-codice').value = decodedText;
+                stopTutteFotocamere();
+                showToast('✓ Codice acquisito');
+              } else if (modalita === 'buoni') {
+                document.getElementById('buono-codice').value = decodedText;
+                stopTutteFotocamere();
+                showToast('✓ Codice acquisito');
+              }
             }
-          }
-        }, (error) => {});
+          },
+          (error) => {}
+        );
       } catch (err) { showToast('Impossibile accedere alla fotocamera'); container.style.display = 'none'; }
     }
 
@@ -320,6 +330,7 @@
       if (modalitaCorrente === modalita) modalitaCorrente = null;
     }
 
+    // OPEN FOOD FACTS
     async function cercaBarcode() {
       const input = document.getElementById('campo-barcode');
       const codice = input.value.trim();
@@ -349,6 +360,7 @@
       }
     }
 
+    // LISTA SPESA
     function aggiungiProdotto() {
       const nome = document.getElementById('campo-input').value.trim();
       if (!nome) return;
@@ -432,6 +444,7 @@
       });
     }
 
+    // CARTE FEDELTÀ
     function salvaCarta() {
       const nome = document.getElementById('carta-nome').value.trim();
       const codice = document.getElementById('carta-codice').value.trim();
@@ -471,8 +484,10 @@
       `).join('');
     }
 
-    // FUNZIONI APP BUONI - CORRETTE
+    // APP BUONI - VERSIONE SEMPLIFICATA E FUNZIONANTE
     function salvaAppBuono() {
+      console.log('salvaAppBuono chiamata'); // Debug
+      
       const select = document.getElementById('app-seleziona');
       let nomeApp = select.value;
       const nomePersonalizzato = document.getElementById('app-nome-personalizzato').value.trim();
@@ -515,6 +530,9 @@
       appsBuoni.push(nuovaApp);
       localStorage.setItem('appsBuoni', JSON.stringify(appsBuoni));
       
+      console.log('App salvata:', nuovaApp);
+      console.log('Totale app:', appsBuoni.length);
+      
       // Pulisci i campi del form
       document.getElementById('app-seleziona').value = '';
       document.getElementById('app-nome-personalizzato').value = '';
@@ -523,7 +541,7 @@
       document.getElementById('app-link').value = '';
       document.getElementById('app-nome-personalizzato').style.display = 'none';
       
-      // RICARICA LA LISTA DELLE APP
+      // RICARICA LA LISTA
       renderAppsBuoni();
       
       showToast(`✓ App ${nomeApp} salvata!`);
@@ -643,6 +661,7 @@
     }
     
     function renderAppsBuoni() {
+      console.log('renderAppsBuoni chiamato, apps:', appsBuoni); // Debug
       const container = document.getElementById('lista-app');
       if (!appsBuoni.length) {
         container.innerHTML = '<p style="text-align:center;color:#aaa;padding:20px">Nessuna app salvata</p>';
@@ -679,6 +698,7 @@
       `}).join('');
     }
 
+    // BUONI FISICI
     function salvaBuono() {
       const nome = document.getElementById('buono-nome').value.trim();
       const codice = document.getElementById('buono-codice').value.trim();
@@ -718,6 +738,7 @@
       `).join('');
     }
 
+    // Seleziona app personalizzata
     document.getElementById('app-seleziona')?.addEventListener('change', function() {
       const personalizzato = document.getElementById('app-nome-personalizzato');
       personalizzato.style.display = this.value === 'Altra' ? 'block' : 'none';
@@ -725,13 +746,16 @@
       document.getElementById('app-link').value = opt.getAttribute('data-link') || '';
     });
 
+    // EVENTI KEYBOARD
     document.getElementById('campo-input')?.addEventListener('keydown', e => e.key === 'Enter' && aggiungiProdotto());
     document.getElementById('campo-barcode')?.addEventListener('keydown', e => e.key === 'Enter' && cercaBarcode());
 
+    // SERVICE WORKER
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error:', err));
     }
 
+    // ESPONI FUNZIONI GLOBALI
     window.avviaFotocamera = avviaFotocamera;
     window.stopFotocamera = stopFotocamera;
     window.cercaBarcode = cercaBarcode;
@@ -757,6 +781,7 @@
     window.chiudiModale = chiudiModale;
     window.vaiA = vaiA;
 
+    // INIT
     renderLista();
     aggiornaContatori();
     renderCarte();
