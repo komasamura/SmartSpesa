@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Fotocamera</title>
+</head>
+<body>
+    <h1>Test Fotocamera</h1>
+    <button onclick="avviaFotocamera()">Avvia Fotocamera</button>
+    <br><br>
+    <video id="video" autoplay playsinline style="width:100%; max-width:400px; border:1px solid black;"></video>
+    <p id="status"></p>
+
+    <script>
+        async function avviaFotocamera() {
+            const status = document.getElementById('status');
+            const video = document.getElementById('video');
+            
+            status.textContent = 'Richiedo accesso alla fotocamera...';
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: true 
+                });
+                
+                video.srcObject = stream;
+                status.textContent = '✅ Fotocamera funzionante!';
+                status.style.color = 'green';
+                
+            } catch (err) {
+                status.textContent = '❌ ERRORE: ' + err.message;
+                status.style.color = 'red';
+                console.error(err);
+            }
+        }
+    </script>
+</body>
+</html>
