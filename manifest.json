@@ -1,0 +1,12 @@
+{
+  "background_color": "#2d6a4f",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "SmartSpesa",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "SmartSpesa",
+  "start_url": "/",
+  "theme_color": "#f5f2eb",
+  "description": "Lista della spesa, carte fedeltà e buoni pasto"
+}

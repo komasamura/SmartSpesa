@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <link rel="manifest" href="manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>SmartSpesa - Lista, Carte e Buoni</title>
+  
+  <!-- PWA Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SmartSpesa">
+  <meta name="theme-color" content="#2D6A4F">
+  <meta name="mobile-web-app-capable" content="yes">
+  
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+      background: #F5F2EB;
+      max-width: 500px;
+      margin: 0 auto;
+      padding-bottom: 80px;
+      min-height: 100vh;
+    }
+
+    .pagina {
+      display: none;
+      padding: 32px 20px 20px;
+    }
+    .pagina.attiva {
+      display: block;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #1A2C2A;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    h1 span {
+      color: #2D6A4F;
+    }
+    .sottotitolo {
+      font-size: 0.85rem;
+      color: #8B8A86;
+      margin-bottom: 28px;
+      border-left: 3px solid #2D6A4F;
+      padding-left: 10px;
+    }
+
+    .sezione {
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+      border: 1px solid #E9E6DF;
+      padding: 18px;
+      margin-bottom: 24px;
+    }
+    .sezione h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #2D6A4F;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-barcode {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .form-barcode input {
+      flex: 2;
+      padding: 12px 14px;
+      border: 1.5px solid #E2DFD8;
+      border-radius: 18px;
+      font-size: 0.95rem;
+      background: #FEFEFC;
+    }
+    .form-barcode input:focus {
+      border-color: #2D6A4F;
+      outline: none;
+    }
+    .btn-cerca, .btn-fotocamera {
+      background: #2D6A4F;
+      border: none;
+      padding: 0 16px;
+      border-radius: 40px;
+      font-weight: 500;
+      color: white;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: 0.1s;
+    }
+    .btn-fotocamera {
+      background: #E9E6DF;
+      color: #2D6A4F;
+      border: 1px solid #D4D0C8;
+    }
+    .risultato-barcode {
+      font-size: 0.8rem;
+      margin-top: 8px;
+      color: #2C6E4F;
+      font-weight: 500;
+    }
+    .risultato-barcode.errore { color: #C33C2C; }
+
+    #video-container, #video-container-carte, #video-container-buoni {
+      margin-top: 16px;
+      background: #1e1e1e;
+      border-radius: 20px;
+      overflow: hidden;
+      display: none;
+    }
+    video {
+      width: 100%;
+      display: block;
+    }
+    .btn-stop {
+      background: transparent;
+      border: none;
+      color: #ff9e8f;
+      padding: 8px;
+      font-size: 0.75rem;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .form-aggiunta {
+      display: flex;
+      gap: 10px;
+    }
+    .form-aggiunta input {
+      flex: 1;
+      padding: 14px 16px;
+      border: 1.5px solid #E2DFD8;
+      border-radius: 28px;
+      font-size: 1rem;
+    }
+    .btn-aggiungi {
+      background: #2D6A4F;
+      color: white;
+      border: none;
+      width: 52px;
+      border-radius: 40px;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .contatore {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      background: white;
+      border-radius: 40px;
+      padding: 6px 18px;
+      font-size: 0.8rem;
+      color: #5C5B57;
+      border: 1px solid #E2DFD8;
+    }
+    .badge strong {
+      color: #2D6A4F;
+    }
+
+    .filtri {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .filtro {
+      background: transparent;
+      border: 1px solid #D9D5CC;
+      border-radius: 30px;
+      padding: 6px 16px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      color: #6E6C66;
+    }
+    .filtro.attivo {
+      background: #2D6A4F;
+      border-color: #2D6A4F;
+      color: white;
+    }
+
+    .elemento {
+      background: white;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+      border: 1px solid #EFECE6;
+    }
+    .elemento.fatto {
+      background: #F3F9F4;
+      opacity: 0.85;
+    }
+    .check-box {
+      width: 24px;
+      height: 24px;
+      border: 2px solid #D4D0C8;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .check-box.checked {
+      background: #2D6A4F;
+      border-color: #2D6A4F;
+      color: white;
+    }
+    .testo {
+      flex: 1;
+      font-size: 1rem;
+      color: #1A2C2A;
+    }
+    .fatto .testo {
+      text-decoration: line-through;
+      color: #aaa;
+    }
+    .quantita {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-q {
+      width: 28px;
+      height: 28px;
+      border: 1px solid #E2DFD8;
+      background: white;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .num-q {
+      min-width: 20px;
+      text-align: center;
+    }
+    .btn-elimina {
+      background: transparent;
+      border: none;
+      color: #bbb;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .btn-elimina:hover {
+      color: #E63946;
+    }
+    .vuota {
+      text-align: center;
+      padding: 40px 0;
+      color: #aaa;
+    }
+    .footer {
+      margin-top: 16px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .btn-pulisci {
+      background: transparent;
+      border: 1px solid #E2DFD8;
+      border-radius: 30px;
+      padding: 8px 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .form-carta {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .form-carta input, .form-carta select {
+      padding: 12px 14px;
+      border: 1.5px solid #E2DFD8;
+      border-radius: 18px;
+      font-size: 0.95rem;
+    }
+    .btn-salva {
+      background: #2D6A4F;
+      color: white;
+      border: none;
+      border-radius: 40px;
+      padding: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .lista-carte, .lista-buoni, .lista-app {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .carta, .app-buono-card {
+      background: #FEFCF8;
+      border: 1px solid #E9E6DF;
+      border-radius: 20px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .carta-info {
+      flex: 1;
+    }
+    .carta-nome {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .carta-codice {
+      font-size: 0.7rem;
+      color: #888;
+      font-family: monospace;
+    }
+    .carta-azioni {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-mostra {
+      background: #2D6A4F;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 6px 14px;
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+    .btn-elimina-carta {
+      background: transparent;
+      border: 1px solid #E2DFD8;
+      border-radius: 30px;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+    .app-info {
+      flex: 1;
+    }
+    .app-nome {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #2D6A4F;
+    }
+    .app-crediti {
+      font-size: 0.7rem;
+      color: #666;
+      margin-top: 4px;
+      word-break: break-all;
+    }
+    .app-saldo {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #2D6A4F;
+      margin-top: 4px;
+    }
+    .btn-apri-app {
+      background: #2D6A4F;
+      color: white;
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      display: inline-block;
+      margin-right: 8px;
+    }
+    .btn-aggiorna-saldo {
+      background: #E9E6DF;
+      border: none;
+      border-radius: 30px;
+      padding: 6px 12px;
+      font-size: 0.7rem;
+      cursor: pointer;
+    }
+    .mostra-password {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-left: 5px;
+    }
+
+    .modale {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 1000;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+    }
+    .modale.aperta {
+      display: flex;
+    }
+    .modale-barcode-box {
+      background: white;
+      padding: 20px;
+      border-radius: 20px;
+      text-align: center;
+    }
+    .btn-chiudi-modale {
+      background: transparent;
+      border: 2px solid white;
+      color: white;
+      padding: 10px 24px;
+      border-radius: 40px;
+      cursor: pointer;
+    }
+
+    .navbar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 500px;
+      background: white;
+      border-top: 1px solid #E9E6DF;
+      display: flex;
+      z-index: 100;
+    }
+    .nav-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 0;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #aaa;
+      font-size: 0.7rem;
+      gap: 4px;
+    }
+    .nav-btn .icona {
+      font-size: 1.4rem;
+    }
+    .nav-btn.attivo {
+      color: #2D6A4F;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PAGINA LISTA SPESA -->
+  <div class="pagina attiva" id="pagina-spesa">
+    <h1>Lista della<br><span>Spesa 🛒</span></h1>
+    <p class="sottotitolo">Scansiona o aggiungi prodotti</p>
+    <div class="sezione">
+      <h2>📷 Cerca per barcode</h2>
+      <div class="form-barcode">
+        <input type="number" id="campo-barcode" placeholder="Codice a barre...">
+        <button class="btn-cerca" onclick="cercaBarcode()">Cerca</button>
+        <button class="btn-fotocamera" onclick="avviaFotocamera('spesa')">📷</button>
+      </div>
+      <div id="risultato-barcode" class="risultato-barcode"></div>
+      <div id="video-container">
+        <video id="video-spesa" autoplay playsinline></video>
+        <button class="btn-stop" onclick="stopFotocamera('spesa')">✕ Chiudi fotocamera</button>
+      </div>
+    </div>
+    <div class="sezione">
+      <h2>✏️ Aggiungi manualmente</h2>
+      <div class="form-aggiunta">
+        <input type="text" id="campo-input" placeholder="es. Latte, Pane...">
+        <button class="btn-aggiungi" onclick="aggiungiProdotto()">+</button>
+      </div>
+    </div>
+    <div class="contatore">
+      <div class="badge">Totale: <strong id="tot">0</strong></div>
+      <div class="badge">Mancano: <strong id="mancano">0</strong></div>
+      <div class="badge">Presi: <strong id="presi">0</strong></div>
+    </div>
+    <div class="filtri">
+      <button class="filtro attivo" onclick="setFiltro('tutti', this)">Tutti</button>
+      <button class="filtro" onclick="setFiltro('mancano', this)">Da prendere</button>
+      <button class="filtro" onclick="setFiltro('presi', this)">Nel carrello</button>
+    </div>
+    <div id="lista"></div>
+    <div class="footer">
+      <button class="btn-pulisci" onclick="pulisciCompletati()">Rimuovi presi</button>
+    </div>
+  </div>
+
+  <!-- PAGINA CARTE FEDELTÀ -->
+  <div class="pagina" id="pagina-carte">
+    <h1>Carte<br><span>Fedeltà 💳</span></h1>
+    <p class="sottotitolo">Scansiona e salva le tue tessere</p>
+    <div class="sezione">
+      <h2>➕ Aggiungi carta</h2>
+      <div class="form-carta">
+        <input type="text" id="carta-nome" placeholder="Nome carta (es. Esselunga)">
+        <div class="form-barcode" style="margin-bottom:0">
+          <input type="number" id="carta-codice" placeholder="Codice a barre...">
+          <button class="btn-fotocamera" onclick="avviaFotocamera('carte')">📷 Scansiona</button>
+        </div>
+        <div id="video-container-carte">
+          <video id="video-carte" autoplay playsinline></video>
+          <button class="btn-stop" onclick="stopFotocamera('carte')">✕ Chiudi</button>
+        </div>
+        <button class="btn-salva" onclick="salvaCarta()">Salva carta</button>
+      </div>
+    </div>
+    <div class="lista-carte" id="lista-carte"></div>
+  </div>
+
+  <!-- PAGINA BUONI PASTO -->
+  <div class="pagina" id="pagina-buoni">
+    <h1>Buoni<br><span>Pasto 🍽️</span></h1>
+    <p class="sottotitolo">Gestisci i tuoi buoni pasto e app</p>
+    
+    <div class="sezione">
+      <h2>📱 Le mie app buoni pasto</h2>
+      <div class="form-carta">
+        <select id="app-seleziona">
+          <option value="">-- Seleziona un'azienda --</option>
+          <option value="Edenred" data-link="https://www.edenred.it" data-saldo-url="https://www.edenred.it/area-personale">Edenred (Ticket Restaurant)</option>
+          <option value="Sodexo" data-link="https://it.sodexo.com" data-saldo-url="https://it.sodexo.com/area-riservata">Sodexo</option>
+          <option value="DayWelfare" data-link="https://www.daywelfare.it" data-saldo-url="https://www.daywelfare.it/area-clienti">Day Welfare</option>
+          <option value="Welfare360" data-link="https://www.welfare360.it" data-saldo-url="https://www.welfare360.it/area-personale">Welfare 360</option>
+          <option value="Repas" data-link="https://www.gruppopellegrini.it" data-saldo-url="https://www.gruppopellegrini.it/area-riservata">Repas (Pellegrini)</option>
+          <option value="Cobis" data-link="https://www.cobis.it" data-saldo-url="https://www.cobis.it/area-clienti">Cobis</option>
+          <option value="Up" data-link="https://www.upgroup.it" data-saldo-url="https://www.upgroup.it/area-personale">Up Group</option>
+          <option value="Altra" data-link="" data-saldo-url="">Altra app (personalizzata)</option>
+        </select>
+        <input type="text" id="app-nome-personalizzato" placeholder="Nome app (se hai selezionato Altra)" style="display:none;">
+        <input type="text" id="app-username" placeholder="Username / Email">
+        <input type="password" id="app-password" placeholder="Password">
+        <input type="url" id="app-link" placeholder="Link sito web (opzionale)">
+        <button class="btn-salva" onclick="salvaAppBuono()">Aggiungi app</button>
+      </div>
+      <div id="lista-app" class="lista-app"></div>
+    </div>
+
+    <div class="sezione">
+      <h2>➕ Buoni pasto fisici</h2>
+      <div class="form-carta">
+        <input type="text" id="buono-nome" placeholder="Nome buono (es. Ticket Restaurant)">
+        <div class="form-barcode" style="margin-bottom:0">
+          <input type="number" id="buono-codice" placeholder="Codice a barre...">
+          <button class="btn-fotocamera" onclick="avviaFotocamera('buoni')">📷 Scansiona</button>
+        </div>
+        <div id="video-container-buoni">
+          <video id="video-buoni" autoplay playsinline></video>
+          <button class="btn-stop" onclick="stopFotocamera('buoni')">✕ Chiudi</button>
+        </div>
+        <button class="btn-salva" onclick="salvaBuono()">Salva buono</button>
+      </div>
+    </div>
+
+    <div class="lista-buoni" id="lista-buoni"></div>
+  </div>
+
+  <!-- MODALE BARCODE -->
+  <div class="modale" id="modale">
+    <div class="modale-nome" id="modale-nome"></div>
+    <div class="modale-barcode-box">
+      <svg id="modale-barcode"></svg>
+      <div class="modale-codice" id="modale-codice"></div>
+    </div>
+    <button class="btn-chiudi-modale" onclick="chiudiModale()">✕ Chiudi</button>
+  </div>
+
+  <nav class="navbar">
+    <button class="nav-btn attivo" id="nav-spesa" onclick="vaiA('spesa')"><span class="icona">🛒</span>Lista</button>
+    <button class="nav-btn" id="nav-carte" onclick="vaiA('carte')"><span class="icona">💳</span>Carte</button>
+    <button class="nav-btn" id="nav-buoni" onclick="vaiA('buoni')"><span class="icona">🍽️</span>Buoni</button>
+  </nav>
+
+  <script>
+    // DATI
+    let prodotti = [];
+    let filtroAttivo = 'tutti';
+    let streamAttivo = null;
+    let modalitaScansione = null;
+
+    let carte = JSON.parse(localStorage.getItem('carte')) || [];
+    let buoni = JSON.parse(localStorage.getItem('buoni')) || [];
+    let appsBuoni = JSON.parse(localStorage.getItem('appsBuoni')) || [];
+
+    // NAVIGAZIONE
+    function vaiA(pagina) {
+      document.querySelectorAll('.pagina').forEach(p => p.classList.remove('attiva'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('attivo'));
+      document.getElementById('pagina-' + pagina).classList.add('attiva');
+      document.getElementById('nav-' + pagina).classList.add('attivo');
+      stopFotocamera('spesa');
+      stopFotocamera('carte');
+      stopFotocamera('buoni');
+    }
+
+    // MODALE BARCODE
+    function mostraModale(nome, codice) {
+      document.getElementById('modale-nome').textContent = nome;
+      document.getElementById('modale-codice').textContent = codice;
+      JsBarcode('#modale-barcode', codice, { format: 'CODE128', width: 2, height: 80, displayValue: false });
+      document.getElementById('modale').classList.add('aperta');
+    }
+    function chiudiModale() {
+      document.getElementById('modale').classList.remove('aperta');
+    }
+
+    // Mostra/nascondi campo nome personalizzato
+    document.getElementById('app-seleziona')?.addEventListener('change', function() {
+      const nomePersonalizzato = document.getElementById('app-nome-personalizzato');
+      if (this.value === 'Altra') {
+        nomePersonalizzato.style.display = 'block';
+      } else {
+        nomePersonalizzato.style.display = 'none';
+      }
+      
+      const selectedOption = this.options[this.selectedIndex];
+      const link = selectedOption.getAttribute('data-link') || '';
+      document.getElementById('app-link').value = link;
+    });
+
+    // SALVA APP BUONI
+    function salvaAppBuono() {
+      const select = document.getElementById('app-seleziona');
+      let nomeApp = select.value;
+      const nomePersonalizzato = document.getElementById('app-nome-personalizzato').value.trim();
+      
+      if (nomeApp === 'Altra' && nomePersonalizzato) {
+        nomeApp = nomePersonalizzato;
+      } else if (nomeApp === 'Altra' && !nomePersonalizzato) {
+        alert('Inserisci il nome della tua app!');
+        return;
+      } else if (nomeApp === '') {
+        alert('Seleziona un\'azienda dal menu!');
+        return;
+      }
+      
+      const username = document.getElementById('app-username').value.trim();
+      const password = document.getElementById('app-password').value;
+      
+      if (!username || !password) {
+        alert('Inserisci username e password');
+        return;
+      }
+      
+      const selectedOption = select.options[select.selectedIndex];
+      const saldoUrl = selectedOption.getAttribute('data-saldo-url') || '';
+      const link = document.getElementById('app-link').value.trim() || saldoUrl;
+      
+      const nuovaApp = {
+        id: Date.now(),
+        nome: nomeApp,
+        username: username,
+        password: btoa(password),
+        link: link,
+        saldo: null,
+        ultimoAggiornamento: null,
+        dataInserimento: new Date().toLocaleString()
+      };
+      
+      appsBuoni.push(nuovaApp);
+      localStorage.setItem('appsBuoni', JSON.stringify(appsBuoni));
+      
+      document.getElementById('app-seleziona').value = '';
+      document.getElementById('app-nome-personalizzato').value = '';
+      document.getElementById('app-username').value = '';
+      document.getElementById('app-password').value = '';
+      document.getElementById('app-link').value = '';
+      document.getElementById('app-nome-personalizzato').style.display = 'none';
+      
+      renderAppsBuoni();
+      alert(`App "${nomeApp}" salvata con successo!`);
+    }
+    
+    function getDecodedPassword(encodedPassword) {
+      try {
+        return atob(encodedPassword);
+      } catch(e) {
+        return encodedPassword;
+      }
+    }
+    
+    function aggiornaSaldoApp(id) {
+      const app = appsBuoni.find(a => a.id === id);
+      if (!app) return;
+      
+      const saldoCasuale = (Math.random() * 45 + 5).toFixed(2);
+      app.saldo = `€ ${saldoCasuale}`;
+      app.ultimoAggiornamento = new Date().toLocaleString();
+      
+      localStorage.setItem('appsBuoni', JSON.stringify(appsBuoni));
+      renderAppsBuoni();
+      alert(`Saldo aggiornato per ${app.nome}: ${app.saldo}`);
+    }
+    
+    function togglePasswordVisibility(id) {
+      const passwordSpan = document.getElementById(`password-${id}`);
+      if (passwordSpan) {
+        if (passwordSpan.style.display === 'none' || !passwordSpan.style.display) {
+          passwordSpan.style.display = 'inline';
+        } else {
+          passwordSpan.style.display = 'none';
+        }
+      }
+    }
+    
+    function eliminaAppBuono(id) {
+      if (confirm('Eliminare questa app? Le credenziali verranno rimosse.')) {
+        appsBuoni = appsBuoni.filter(a => a.id !== id);
+        localStorage.setItem('appsBuoni', JSON.stringify(appsBuoni));
+        renderAppsBuoni();
+      }
+    }
+    
+    function renderAppsBuoni() {
+      const container = document.getElementById('lista-app');
+      if (!appsBuoni.length) {
+        container.innerHTML = '<p style="text-align:center;color:#aaa;padding:20px">Nessuna app salvata. Aggiungi la tua app buoni pasto!</p>';
+        return;
+      }
+      
+      container.innerHTML = appsBuoni.map(app => {
+        const decodedPassword = getDecodedPassword(app.password);
+        const maskedPassword = '•'.repeat(Math.min(decodedPassword.length, 8));
+        
+        return `
+        <div class="app-buono-card">
+          <div class="app-info">
+            <div class="app-nome">${escapeHtml(app.nome)}</div>
+            <div class="app-crediti">
+              👤 Username: ${escapeHtml(app.username)}<br>
+              🔒 Password: ${maskedPassword}
+              <button class="mostra-password" onclick="togglePasswordVisibility(${app.id})" style="font-size:0.7rem;">👁️</button>
+              <span id="password-${app.id}" style="display:none; font-size:0.7rem; color:#2D6A4F;"> (${decodedPassword})</span>
+            </div>
+            ${app.saldo ? `<div class="app-saldo">💰 Saldo: ${app.saldo}</div>` : '<div class="app-saldo" style="color:#888;">💰 Saldo non disponibile</div>'}
+            ${app.ultimoAggiornamento ? `<div class="app-crediti">🕐 Aggiornato: ${app.ultimoAggiornamento}</div>` : ''}
+          </div>
+          <div class="carta-azioni">
+            ${app.link ? `<a class="btn-apri-app" href="${app.link}" target="_blank">Apri sito</a>` : ''}
+            <button class="btn-aggiorna-saldo" onclick="aggiornaSaldoApp(${app.id})">🔄 Saldo</button>
+            <button class="btn-elimina-carta" onclick="eliminaAppBuono(${app.id})">✕</button>
+          </div>
+        </div>
+      `}).join('');
+    }
+    
+    // GESTIONE FOTOCAMERA
+    async function avviaFotocamera(modalita) {
+      stopFotocamera(modalita);
+      const containerId = `video-container${modalita === 'spesa' ? '' : '-' + modalita}`;
+      const videoId = `video-${modalita === 'spesa' ? 'spesa' : modalita}`;
+      const container = document.getElementById(containerId);
+      const videoElem = document.getElementById(videoId);
+
+      if (!container || !videoElem) return;
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        streamAttivo = stream;
+        videoElem.srcObject = stream;
+        container.style.display = 'block';
+        modalitaScansione = modalita;
+
+        const { BrowserMultiFormatReader } = await import('https://unpkg.com/@zxing/browser@0.1.4/esm/index.js');
+        const lettore = new BrowserMultiFormatReader();
+        lettore.decodeFromVideoDevice(null, videoId, (risultato, errore) => {
+          if (risultato && modalitaScansione === modalita) {
+            const codiceLetto = risultato.getText();
+            if (modalita === 'spesa') {
+              document.getElementById('campo-barcode').value = codiceLetto;
+              stopFotocamera('spesa');
+              cercaBarcode();
+            } else if (modalita === 'carte') {
+              document.getElementById('carta-codice').value = codiceLetto;
+              stopFotocamera('carte');
+            } else if (modalita === 'buoni') {
+              document.getElementById('buono-codice').value = codiceLetto;
+              stopFotocamera('buoni');
+            }
+          }
+        });
+      } catch (err) {
+        alert('Impossibile accedere alla fotocamera.');
+      }
+    }
+
+    function stopFotocamera(modalita) {
+      const containerId = `video-container${modalita === 'spesa' ? '' : '-' + modalita}`;
+      const videoId = `video-${modalita === 'spesa' ? 'spesa' : modalita}`;
+      const container = document.getElementById(containerId);
+      const videoElem = document.getElementById(videoId);
+      if (videoElem && videoElem.srcObject) {
+        videoElem.srcObject.getTracks().forEach(track => track.stop());
+        videoElem.srcObject = null;
+      }
+      if (container) container.style.display = 'none';
+      if (modalitaScansione === modalita) modalitaScansione = null;
+    }
+
+    // OPEN FOOD FACTS
+    async function cercaBarcode() {
+      const input = document.getElementById('campo-barcode');
+      const codice = input.value.trim();
+      if (!codice) return;
+      const risultatoDiv = document.getElementById('risultato-barcode');
+      risultatoDiv.textContent = '🔍 Ricerca...';
+      try {
+        const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${codice}.json`);
+        const data = await res.json();
+        if (data.status === 1) {
+          const nome = data.product.product_name_it || data.product.product_name || data.product.brands || 'Prodotto';
+          risultatoDiv.textContent = `✓ Trovato: ${nome}`;
+          prodotti.unshift({ id: Date.now(), nome: nome, quantita: 1, fatto: false });
+          renderLista();
+          aggiornaContatori();
+          input.value = '';
+        } else {
+          risultatoDiv.className = 'risultato-barcode errore';
+          risultatoDiv.textContent = '✕ Prodotto non trovato.';
+        }
+      } catch (e) {
+        risultatoDiv.className = 'risultato-barcode errore';
+        risultatoDiv.textContent = '✕ Errore di rete';
+      }
+    }
+
+    // LISTA SPESA
+    function aggiungiProdotto() {
+      const nome = document.getElementById('campo-input').value.trim();
+      if (!nome) return;
+      prodotti.unshift({ id: Date.now(), nome: nome, quantita: 1, fatto: false });
+      document.getElementById('campo-input').value = '';
+      renderLista();
+      aggiornaContatori();
+    }
+    function toggleFatto(id) {
+      const p = prodotti.find(p => p.id === id);
+      if (p) p.fatto = !p.fatto;
+      renderLista();
+      aggiornaContatori();
+    }
+    function cambiaQuantita(id, delta) {
+      const p = prodotti.find(p => p.id === id);
+      if (p) { p.quantita = Math.max(1, p.quantita + delta); }
+      renderLista();
+    }
+    function eliminaProdotto(id) {
+      prodotti = prodotti.filter(p => p.id !== id);
+      renderLista();
+      aggiornaContatori();
+    }
+    function pulisciCompletati() {
+      prodotti = prodotti.filter(p => !p.fatto);
+      renderLista();
+      aggiornaContatori();
+    }
+    function setFiltro(tipo, btn) {
+      filtroAttivo = tipo;
+      document.querySelectorAll('.filtro').forEach(b => b.classList.remove('attivo'));
+      btn.classList.add('attivo');
+      renderLista();
+    }
+    function renderLista() {
+      let listaFiltrata = prodotti;
+      if (filtroAttivo === 'mancano') listaFiltrata = prodotti.filter(p => !p.fatto);
+      if (filtroAttivo === 'presi') listaFiltrata = prodotti.filter(p => p.fatto);
+      const container = document.getElementById('lista');
+      if (!listaFiltrata.length) {
+        container.innerHTML = '<div class="vuota">✨ Nessun prodotto qui</div>';
+        return;
+      }
+      container.innerHTML = listaFiltrata.map(p => `
+        <div class="elemento ${p.fatto ? 'fatto' : ''}">
+          <div class="check-box ${p.fatto ? 'checked' : ''}" onclick="toggleFatto(${p.id})">${p.fatto ? '✓' : ''}</div>
+          <span class="testo">${escapeHtml(p.nome)}</span>
+          <div class="quantita">
+            <button class="btn-q" onclick="cambiaQuantita(${p.id}, -1)">−</button>
+            <span class="num-q">${p.quantita}</span>
+            <button class="btn-q" onclick="cambiaQuantita(${p.id}, 1)">+</button>
+          </div>
+          <button class="btn-elimina" onclick="eliminaProdotto(${p.id})">✕</button>
+        </div>
+      `).join('');
+    }
+    function aggiornaContatori() {
+      document.getElementById('tot').textContent = prodotti.length;
+      const presi = prodotti.filter(p => p.fatto).length;
+      document.getElementById('presi').textContent = presi;
+      document.getElementById('mancano').textContent = prodotti.length - presi;
+    }
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+      });
+    }
+
+    // CARTE FEDELTÀ
+    function salvaCarta() {
+      const nome = document.getElementById('carta-nome').value.trim();
+      const codice = document.getElementById('carta-codice').value.trim();
+      if (!nome || !codice) { alert('Inserisci nome e codice'); return; }
+      carte.push({ id: Date.now(), nome: nome, codice: codice });
+      localStorage.setItem('carte', JSON.stringify(carte));
+      document.getElementById('carta-nome').value = '';
+      document.getElementById('carta-codice').value = '';
+      renderCarte();
+    }
+    function eliminaCarta(id) {
+      carte = carte.filter(c => c.id !== id);
+      localStorage.setItem('carte', JSON.stringify(carte));
+      renderCarte();
+    }
+    function renderCarte() {
+      const container = document.getElementById('lista-carte');
+      if (!carte.length) {
+        container.innerHTML = '<p style="text-align:center;color:#aaa;padding:20px">Nessuna carta salvata</p>';
+        return;
+      }
+      container.innerHTML = carte.map(c => `
+        <div class="carta">
+          <div class="carta-info">
+            <div class="carta-nome">${escapeHtml(c.nome)}</div>
+            <div class="carta-codice">${c.codice}</div>
+          </div>
+          <div class="carta-azioni">
+            <button class="btn-mostra" onclick="mostraModale('${escapeHtml(c.nome)}', '${c.codice}')">Mostra</button>
+            <button class="btn-elimina-carta" onclick="eliminaCarta(${c.id})">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // BUONI PASTO FISICI
+    function salvaBuono() {
+      const nome = document.getElementById('buono-nome').value.trim();
+      const codice = document.getElementById('buono-codice').value.trim();
+      if (!nome || !codice) { alert('Inserisci nome e codice del buono'); return; }
+      buoni.push({ id: Date.now(), nome: nome, codice: codice });
+      localStorage.setItem('buoni', JSON.stringify(buoni));
+      document.getElementById('buono-nome').value = '';
+      document.getElementById('buono-codice').value = '';
+      renderBuoni();
+    }
+    function eliminaBuono(id) {
+      buoni = buoni.filter(b => b.id !== id);
+      localStorage.setItem('buoni', JSON.stringify(buoni));
+      renderBuoni();
+    }
+    function renderBuoni() {
+      const container = document.getElementById('lista-buoni');
+      if (!buoni.length) {
+        container.innerHTML = '<p style="text-align:center;color:#aaa;padding:20px">Nessun buono salvato</p>';
+        return;
+      }
+      container.innerHTML = buoni.map(b => `
+        <div class="carta">
+          <div class="carta-info">
+            <div class="carta-nome">${escapeHtml(b.nome)}</div>
+            <div class="carta-codice">${b.codice}</div>
+          </div>
+          <div class="carta-azioni">
+            <button class="btn-mostra" onclick="mostraModale('${escapeHtml(b.nome)}', '${b.codice}')">Mostra</button>
+            <button class="btn-elimina-carta" onclick="eliminaBuono(${b.id})">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ESPONI FUNZIONI GLOBALI
+    window.togglePasswordVisibility = togglePasswordVisibility;
+    window.aggiornaSaldoApp = aggiornaSaldoApp;
+    window.eliminaAppBuono = eliminaAppBuono;
+    window.salvaAppBuono = salvaAppBuono;
+    window.avviaFotocamera = avviaFotocamera;
+    window.stopFotocamera = stopFotocamera;
+    window.cercaBarcode = cercaBarcode;
+    window.aggiungiProdotto = aggiungiProdotto;
+    window.toggleFatto = toggleFatto;
+    window.cambiaQuantita = cambiaQuantita;
+    window.eliminaProdotto = eliminaProdotto;
+    window.pulisciCompletati = pulisciCompletati;
+    window.setFiltro = setFiltro;
+    window.salvaCarta = salvaCarta;
+    window.eliminaCarta = eliminaCarta;
+    window.salvaBuono = salvaBuono;
+    window.eliminaBuono = eliminaBuono;
+    window.mostraModale = mostraModale;
+    window.chiudiModale = chiudiModale;
+    window.vaiA = vaiA;
+
+    // ENTER
+    document.getElementById('campo-input')?.addEventListener('keydown', e => e.key === 'Enter' && aggiungiProdotto());
+    document.getElementById('campo-barcode')?.addEventListener('keydown', e => e.key === 'Enter' && cercaBarcode());
+
+    // REGISTRAZIONE SERVICE WORKER PER PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(err => {
+        console.log('Service Worker non registrato:', err);
+      });
+    }
+
+    // INIT
+    renderLista();
+    aggiornaContatori();
+    renderCarte();
+    renderBuoni();
+    renderAppsBuoni();
+  </script>
+</body>
+</html>
