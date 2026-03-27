@@ -1,8 +1,9 @@
 {
   "name": "SmartSpesa",
   "short_name": "SmartSpesa",
-  "description": "Lista della spesa, carte fedeltà e buoni pasto",
-  "start_url": "/",
+  "description": "Lista della spesa condivisa con la famiglia",
+  "start_url": "/spesa/",
+  "scope": "/spesa/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#F5F2EB",
