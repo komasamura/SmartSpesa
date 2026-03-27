@@ -1,8 +1,8 @@
 const CACHE_NAME = 'smartspesa-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json'
+  '/spesa/',
+  '/spesa/index.html',
+  '/spesa/manifest.json'
 ];
 
 self.addEventListener('install', event => {
