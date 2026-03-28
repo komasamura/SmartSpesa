@@ -185,6 +185,14 @@
     .btn-cerca, .btn-fotocamera { background: #2D6A4F; border: none; padding: 0 16px; border-radius: 40px; font-weight: 500; color: white; cursor: pointer; font-size: 0.85rem; }
     .btn-fotocamera { background: #E9E6DF; color: #2D6A4F; border: 1px solid #D4D0C8; }
     .risultato-barcode { font-size: 0.8rem; margin-top: 8px; color: #2C6E4F; font-weight: 500; }
+    .prodotto-trovato { background: #F3F9F4; border: 1px solid #B7DFC8; border-radius: 16px; padding: 12px; margin-top: 10px; display: flex; align-items: center; gap: 12px; }
+    .prodotto-trovato img { width: 60px; height: 60px; object-fit: contain; border-radius: 10px; background: white; border: 1px solid #E2DFD8; flex-shrink: 0; }
+    .prodotto-trovato .prodotto-dettagli { flex: 1; }
+    .prodotto-trovato .prodotto-nome-trovato { font-weight: 700; font-size: 0.95rem; color: #1A2C2A; }
+    .prodotto-trovato .prodotto-marca { font-size: 0.75rem; color: #2D6A4F; font-weight: 600; margin-top: 2px; }
+    .prodotto-trovato .prodotto-categoria { font-size: 0.7rem; color: #888; margin-top: 2px; }
+    .prodotto-trovato-errore { background: #FFF3F3; border: 1px solid #FFCDD2; border-radius: 16px; padding: 10px 14px; margin-top: 10px; font-size: 0.82rem; color: #C0392B; }
+    .prodotto-trovato-loading { background: #F5F2EB; border-radius: 16px; padding: 10px 14px; margin-top: 10px; font-size: 0.82rem; color: #888; }
     .scanner-container { margin-top: 16px; position: relative; display: none; }
     .scanner-container video { width: 100%; border-radius: 20px; }
     .btn-stop { background: #E63946; color: white; border: none; padding: 10px; border-radius: 40px; margin-top: 10px; width: 100%; cursor: pointer; font-weight: bold; }
@@ -202,9 +210,12 @@
     .filtro.attivo { background: #2D6A4F; border-color: #2D6A4F; color: white; }
     .elemento { background: white; border-radius: 20px; display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 10px; border: 1px solid #EFECE6; flex-wrap: wrap; }
     .elemento.fatto { background: #F3F9F4; opacity: 0.85; }
+    .elemento-foto { width: 36px; height: 36px; object-fit: contain; border-radius: 8px; background: #F5F2EB; border: 1px solid #E2DFD8; flex-shrink: 0; }
     .check-box { width: 24px; height: 24px; border: 2px solid #D4D0C8; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .check-box.checked { background: #2D6A4F; border-color: #2D6A4F; color: white; }
-    .testo { flex: 1; font-size: 1rem; color: #1A2C2A; }
+    .testo { flex: 1; }
+    .testo-nome { font-size: 1rem; color: #1A2C2A; }
+    .testo-marca { font-size: 0.7rem; color: #2D6A4F; font-weight: 600; margin-top: 1px; }
     .prezzo-prodotto { font-size: 0.7rem; color: #2D6A4F; font-weight: 500; background: #E8F5E9; padding: 2px 8px; border-radius: 20px; }
     .quantita { display: flex; align-items: center; gap: 6px; }
     .btn-q { width: 28px; height: 28px; border: 1px solid #E2DFD8; background: white; border-radius: 10px; cursor: pointer; }
@@ -242,6 +253,35 @@
     @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
     .sync-status { background: #E8F5E9; padding: 8px 12px; border-radius: 20px; font-size: 0.7rem; color: #2D6A4F; margin-bottom: 10px; text-align: center; }
     .offline-badge { background: #FF9800; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; margin-left: 10px; }
+    /* BUONI PASTO - NUOVA VERSIONE */
+    .buono-card { background: white; border: 1px solid #E9E6DF; border-radius: 20px; padding: 16px; margin-bottom: 12px; }
+    .buono-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .buono-nome { font-weight: 700; font-size: 1rem; color: #1A2C2A; }
+    .buono-saldo-badge { background: #E8F5E9; color: #2D6A4F; font-weight: 700; font-size: 0.9rem; padding: 4px 12px; border-radius: 20px; }
+    .buono-saldo-badge.basso { background: #FFF3E0; color: #E65100; }
+    .buono-saldo-badge.esaurito { background: #FFEBEE; color: #C62828; }
+    .buono-progressbar-wrap { background: #F0EDE8; border-radius: 20px; height: 8px; margin-bottom: 10px; overflow: hidden; }
+    .buono-progressbar { background: #2D6A4F; height: 100%; border-radius: 20px; transition: width 0.4s; }
+    .buono-progressbar.basso { background: #FF9800; }
+    .buono-progressbar.esaurito { background: #E63946; }
+    .buono-stats { display: flex; gap: 12px; font-size: 0.75rem; color: #888; margin-bottom: 12px; flex-wrap: wrap; }
+    .buono-stats span strong { color: #1A2C2A; }
+    .buono-azioni { display: flex; gap: 8px; flex-wrap: wrap; }
+    .buono-azioni button { border: none; border-radius: 30px; padding: 7px 14px; font-size: 0.75rem; font-weight: 600; cursor: pointer; }
+    .btn-b-imposta { background: #E8F5E9; color: #2D6A4F; }
+    .btn-b-usa { background: #2D6A4F; color: white; }
+    .btn-b-storico { background: #F5F2EB; color: #555; border: 1px solid #E2DFD8 !important; }
+    .btn-b-elimina { background: #FFEBEE; color: #C62828; }
+    /* STORICO */
+    .storico-item { padding: 10px 0; border-bottom: 1px solid #F0EDE8; display: flex; justify-content: space-between; align-items: center; }
+    .storico-item:last-child { border-bottom: none; }
+    .storico-data { font-size: 0.72rem; color: #aaa; }
+    .storico-desc { font-size: 0.88rem; color: #333; font-weight: 500; }
+    .storico-importo { font-size: 0.9rem; font-weight: 700; color: #E63946; }
+    .storico-riepilogo { background: #F3F9F4; border-radius: 14px; padding: 12px; margin-bottom: 14px; display: flex; gap: 16px; }
+    .storico-riepilogo div { flex: 1; text-align: center; }
+    .storico-riepilogo .label { font-size: 0.7rem; color: #888; }
+    .storico-riepilogo .valore { font-size: 1rem; font-weight: 700; color: #2D6A4F; }
     .storico-modal {
       position: fixed;
       top: 50%;
@@ -261,7 +301,7 @@
     .storico-modal h3 { margin-bottom: 15px; color: #2D6A4F; }
     .storico-modal ul { list-style: none; padding: 0; }
     .storico-modal li { padding: 8px 0; border-bottom: 1px solid #E9E6DF; }
-    .storico-modal .close-storico { background: #E63946; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 15px; cursor: pointer; }
+    .storico-modal .close-storico { background: #E63946; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 15px; cursor: pointer; width: 100%; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -284,11 +324,12 @@
     <button onclick="accediFamiglia()">🔑 Accedi con questo codice</button>
     <div class="divider"><span>oppure</span></div>
     <button onclick="mostraCreaFamiglia()" class="btn-secondary">➕ Crea nuova famiglia</button>
-    <div id="crea-famiglia-section" style="display:none; margin-top:20px;">
-      <hr><p style="text-align:center; margin-bottom:10px;">🏠 <strong>Crea una nuova famiglia</strong></p>
-      <input type="text" id="new-family-name" placeholder="Nome famiglia (es. Rossi, Bianchi...)" style="text-align:left;">
-      <button onclick="creaNuovaFamiglia()">Crea famiglia e genera codice</button>
-      <button onclick="nascondiCreaFamiglia()" class="btn-secondary" style="margin-top:8px;">Annulla</button>
+    <div id="crea-famiglia-section" style="display:none; margin-top:20px; width:100%; display:none; flex-direction:column; gap:0;">
+      <hr style="margin-bottom:16px; border:none; border-top:1px solid #E2DFD8;">
+      <p style="text-align:center; margin-bottom:12px;">🏠 <strong>Crea una nuova famiglia</strong></p>
+      <input type="text" id="new-family-name" placeholder="Nome famiglia (es. Rossi, Bianchi...)" style="text-align:left; letter-spacing:0; width:100%; display:block;">
+      <button onclick="creaNuovaFamiglia()" style="width:100%; display:block; margin-top:12px;">Crea famiglia e genera codice</button>
+      <button onclick="nascondiCreaFamiglia()" class="btn-secondary" style="margin-top:8px; width:100%; display:block;">Annulla</button>
     </div>
   </div>
 
@@ -355,46 +396,25 @@
 
     <div class="pagina" id="pagina-buoni">
       <h1>Buoni<br><span>Pasto 🍽️</span></h1>
-      <p class="sottotitolo">Gestisci i tuoi buoni pasto e app</p>
+      <p class="sottotitolo">Gestisci il tuo saldo buoni pasto</p>
       <div class="sezione">
-        <h2>📱 Le mie app buoni pasto</h2>
+        <h2>➕ Aggiungi buono pasto</h2>
         <div class="form-carta">
-          <select id="app-seleziona">
-            <option value="">-- Seleziona un'azienda --</option>
-            <option value="Edenred" data-link="https://www.edenred.it">Edenred (Ticket Restaurant)</option>
-            <option value="Sodexo" data-link="https://it.sodexo.com">Sodexo</option>
-            <option value="DayWelfare" data-link="https://www.daywelfare.it">Day Welfare</option>
-            <option value="Welfare360" data-link="https://www.welfare360.it">Welfare 360</option>
-            <option value="Repas" data-link="https://www.gruppopellegrini.it">Repas (Pellegrini)</option>
-            <option value="Cobis" data-link="https://www.cobis.it">Cobis</option>
-            <option value="Up" data-link="https://www.upgroup.it">Up Group</option>
-            <option value="Altra" data-link="">Altra app (personalizzata)</option>
-          </select>
-          <input type="text" id="app-nome-personalizzato" placeholder="Nome app" style="display:none;">
-          <input type="text" id="app-username" placeholder="Username / Email">
-          <input type="password" id="app-password" placeholder="Password">
-          <input type="url" id="app-link" placeholder="Link sito web">
-          <button class="btn-salva" onclick="salvaAppBuono()">Aggiungi app</button>
-        </div>
-        <div id="lista-app" class="lista-app"></div>
-      </div>
-      <div class="sezione">
-        <h2>➕ Buoni pasto fisici</h2>
-        <div class="form-carta">
-          <input type="text" id="buono-nome" placeholder="Nome buono">
+          <input type="text" id="buono-nome" placeholder="Nome (es. Edenred, Ticket Restaurant...)">
+          <input type="number" id="buono-saldo-iniziale" placeholder="Saldo iniziale (€)" step="0.01" min="0">
           <div class="form-barcode" style="margin-bottom:0">
-            <input type="text" id="buono-codice" placeholder="Codice a barre...">
+            <input type="text" id="buono-codice" placeholder="Codice a barre (opzionale)">
             <button class="btn-fotocamera" onclick="avviaFotocamera('buoni')">📷 Scansiona</button>
           </div>
           <div id="scanner-container-buoni" class="scanner-container"><div id="reader-buoni"></div><button class="btn-stop" onclick="stopFotocamera('buoni')">✕ Chiudi</button></div>
-          <button class="btn-salva" onclick="salvaBuono()">Salva buono</button>
+          <button class="btn-salva" onclick="salvaBuono()">Aggiungi buono pasto</button>
         </div>
       </div>
-      <div class="lista-buoni" id="lista-buoni"></div>
+      <div id="lista-buoni"></div>
     </div>
 
     <!-- MODALI -->
-    <div id="storico-modal" class="storico-modal"><h3>📋 Storico spese buoni pasto</h3><div id="storico-lista"></div><button class="close-storico" onclick="chiudiStorico()">Chiudi</button></div>
+    <div id="storico-modal" class="storico-modal"><h3 id="storico-modal-titolo">📋 Storico spese</h3><div id="storico-riepilogo-box"></div><div id="storico-lista"></div><button class="close-storico" onclick="chiudiStorico()">Chiudi</button></div>
     <div class="modale" id="modale"><div class="modale-nome" id="modale-nome"></div><div class="modale-barcode-box"><svg id="modale-barcode"></svg><div class="modale-codice" id="modale-codice"></div></div><button class="btn-chiudi-modale" onclick="chiudiModale()">✕ Chiudi</button></div>
     <div id="stats-modal" class="stats-modal"><div class="stats-box"><h3>📊 Statistiche della spesa</h3><canvas id="spesa-chart"></canvas><div class="stats-buttons"><button onclick="cambiaPeriodo('settimana')">Settimana</button><button onclick="cambiaPeriodo('mese')">Mese</button><button onclick="cambiaPeriodo('anno')">Anno</button></div><div id="stats-totale"></div><button class="btn-chiudi-modale" onclick="chiudiStats()">Chiudi</button></div></div>
 
@@ -441,7 +461,6 @@
     let modalitaCorrente = null;
     let carte = [];
     let buoni = [];
-    let appsBuoni = [];
     let storicoSpese = {};
     let storicoAcquisti = JSON.parse(localStorage.getItem('storicoAcquisti')) || [];
     
@@ -490,6 +509,7 @@
       if(!db) { alert("Connessione a Firebase non disponibile. Ricarica la pagina."); return; }
       const nome = document.getElementById('new-family-name').value.trim();
       if(!nome){ alert('Inserisci un nome per la famiglia'); return; }
+      if(!isOnline) { alert('Sei offline. Connettiti a internet per creare la famiglia.'); return; }
       const codice = generaCodiceFamiglia();
       db.ref('famiglie/' + codice).set({ nome: nome, codice: codice, dataCreazione: new Date().toISOString() }).then(() => {
         localStorage.setItem('smartspesa_family', codice);
@@ -501,7 +521,10 @@
         document.getElementById('family-name-display').innerHTML = `🏠 ${nome} | <span style="font-family:monospace">Codice: ${codice}</span> <button class="btn-copy" onclick="copiaCodice()">📋 Copia</button>`;
         caricaDatiFamiglia();
         showToast(`✅ Famiglia "${nome}" creata! Codice: ${codice}`);
-      }).catch(err => { console.error(err); alert("Errore nella creazione della famiglia. Verifica la connessione internet."); });
+      }).catch(err => { 
+        console.error('Errore Firebase:', err); 
+        alert("Errore nella creazione: " + (err.message || err) + "\nVerifica la connessione internet e riprova."); 
+      });
     }
     
     function copiaCodice() { if(currentFamilyCode){ navigator.clipboard.writeText(currentFamilyCode); showToast('📋 Codice copiato!'); } }
@@ -526,8 +549,8 @@
       });
     }
     
-    function mostraCreaFamiglia() { document.getElementById('crea-famiglia-section').style.display = 'block'; }
-    function nascondiCreaFamiglia() { document.getElementById('crea-famiglia-section').style.display = 'none'; document.getElementById('new-family-name').value = ''; }
+    function mostraCreaFamiglia() { const d=document.getElementById('crea-famiglia-section'); d.style.display='flex'; d.style.flexDirection='column'; }
+    function nascondiCreaFamiglia() { document.getElementById('crea-famiglia-section').style.display='none'; document.getElementById('new-family-name').value=''; }
     
     function caricaDatiFamiglia() {
       if(!db || !currentFamilyCode) return;
@@ -535,7 +558,6 @@
       r.child('prodotti').on('value', s => { if(!ignoreSync){ prodotti = s.val() || []; renderLista(); aggiornaContatori(); calcolaTotaleSpesa(); } });
       r.child('carte').on('value', s => { if(!ignoreSync){ carte = s.val() || []; renderCarte(); } });
       r.child('buoni').on('value', s => { if(!ignoreSync){ buoni = s.val() || []; renderBuoni(); } });
-      r.child('appsBuoni').on('value', s => { if(!ignoreSync){ appsBuoni = s.val() || []; renderAppsBuoni(); } });
       r.child('storicoSpese').on('value', s => { if(!ignoreSync){ storicoSpese = s.val() || {}; } });
       document.getElementById('sync-status').innerHTML = isOnline ? '✅ Sincronizzato con il cloud' : '⚠️ Offline - modifiche salvate localmente';
     }
@@ -547,7 +569,6 @@
       r.child('prodotti').set(prodotti);
       r.child('carte').set(carte);
       r.child('buoni').set(buoni);
-      r.child('appsBuoni').set(appsBuoni);
       r.child('storicoSpese').set(storicoSpese);
       setTimeout(() => ignoreSync = false, 500);
     }
@@ -571,6 +592,8 @@
     }
     
     // LISTA SPESA CON PREZZI
+    let prodottoTrovato = null; // tiene marca e foto dall'ultimo barcode cercato
+
     function aggiungiProdotto() {
       const nome = document.getElementById('campo-input').value.trim();
       const prezzo = parseFloat(document.getElementById('campo-prezzo').value);
@@ -591,11 +614,16 @@
         nome: nome, 
         quantita: quantita, 
         fatto: false, 
-        prezzo: isNaN(prezzo) ? null : prezzo 
+        prezzo: isNaN(prezzo) ? null : prezzo,
+        marca: prodottoTrovato ? (prodottoTrovato.marca || null) : null,
+        foto: prodottoTrovato ? (prodottoTrovato.foto || null) : null
       });
       document.getElementById('campo-input').value = '';
       document.getElementById('campo-prezzo').value = '';
       document.getElementById('campo-quantita').value = '1';
+      document.getElementById('risultato-barcode').innerHTML = '';
+      document.getElementById('campo-barcode').value = '';
+      prodottoTrovato = null;
       renderLista();
       aggiornaContatori();
       calcolaTotaleSpesa();
@@ -647,7 +675,11 @@
       c.innerHTML=l.map(p => `
         <div class="elemento ${p.fatto?'fatto':''}">
           <div class="check-box ${p.fatto?'checked':''}" onclick="toggleFatto(${p.id})">${p.fatto?'✓':''}</div>
-          <span class="testo">${escapeHtml(p.nome)}</span>
+          ${p.foto ? `<img class="elemento-foto" src="${escapeHtml(p.foto)}" alt="" onerror="this.style.display='none'">` : ''}
+          <div class="testo">
+            <div class="testo-nome">${escapeHtml(p.nome)}</div>
+            ${p.marca ? `<div class="testo-marca">🏷️ ${escapeHtml(p.marca)}</div>` : ''}
+          </div>
           ${p.prezzo ? `<span class="prezzo-prodotto">€${(p.prezzo * p.quantita).toFixed(2)}</span>` : ''}
           <div class="quantita">
             <button class="btn-q" onclick="cambiaQuantita(${p.id}, -1)">−</button>
@@ -671,22 +703,96 @@
     function eliminaCarta(id) { carte=carte.filter(c=>c.id!==id); renderCarte(); salvaDatiFamiglia(); showToast('✓ Carta eliminata'); }
     function renderCarte() { const c=document.getElementById('lista-carte'); if(!carte.length){ c.innerHTML='<p style="text-align:center;color:#aaa;padding:20px">Nessuna carta salvata</p>'; return; } c.innerHTML=carte.map(card=>`<div class="carta"><div class="carta-info"><div class="carta-nome">${escapeHtml(card.nome)}</div><div class="carta-codice">${card.codice}</div></div><div class="carta-azioni"><button class="btn-mostra" onclick="mostraModale('${escapeHtml(card.nome)}','${card.codice}')">Mostra</button><button class="btn-elimina-carta" onclick="eliminaCarta(${card.id})">✕</button></div></div>`).join(''); }
     
-    // APP BUONI
-    function salvaAppBuono() { const s=document.getElementById('app-seleziona'); let n=s.value, p=document.getElementById('app-nome-personalizzato').value.trim(); if(n==='Altra'&&p) n=p; else if(n==='Altra'&&!p){ showToast('Inserisci nome app'); return; } else if(!n){ showToast('Seleziona un\'azienda'); return; } const u=document.getElementById('app-username').value.trim(), pw=document.getElementById('app-password').value, l=document.getElementById('app-link').value.trim(); if(!u||!pw){ showToast('Inserisci username e password'); return; } const nuova={id:Date.now(), nome:n, username:u, password:btoa(pw), link:l&&!l.startsWith('http')?'https://'+l:l, saldoIniziale:null, saldoResiduo:null, speseTotali:0, dataInserimento:new Date().toLocaleString()}; appsBuoni.push(nuova); document.getElementById('app-seleziona').value=''; document.getElementById('app-nome-personalizzato').value=''; document.getElementById('app-username').value=''; document.getElementById('app-password').value=''; document.getElementById('app-link').value=''; document.getElementById('app-nome-personalizzato').style.display='none'; renderAppsBuoni(); salvaDatiFamiglia(); showToast(`✓ App ${n} salvata!`); }
-    function getDecodedPassword(e) { try{ return atob(e); }catch(e){ return e; } }
-    function impostaSaldoIniziale(id) { const a=appsBuoni.find(a=>a.id===id); if(!a) return; const s=prompt('Saldo iniziale (€):',a.saldoIniziale||''); if(s&&!isNaN(parseFloat(s))){ a.saldoIniziale=parseFloat(s); a.saldoResiduo=parseFloat(s); a.speseTotali=0; renderAppsBuoni(); salvaDatiFamiglia(); showToast(`✓ Saldo: €${s}`); } }
-    function registraSpesa(id) { const a=appsBuoni.find(a=>a.id===id); if(!a||a.saldoResiduo===null){ showToast('Prima imposta il saldo'); return; } const v=prompt('Importo speso (€):',''); if(v&&!isNaN(parseFloat(v))){ const sp=parseFloat(v); if(sp>a.saldoResiduo){ showToast(`Saldo insufficiente! Residuo: €${a.saldoResiduo.toFixed(2)}`); return; } a.saldoResiduo-=sp; a.speseTotali+=sp; if(!storicoSpese[id]) storicoSpese[id]=[]; storicoSpese[id].push({data:new Date().toLocaleString(), importo:sp, descrizione:prompt('Descrizione:','Acquisto')||'Acquisto'}); renderAppsBuoni(); salvaDatiFamiglia(); showToast(`✓ Spesa: €${sp.toFixed(2)} - Residuo: €${a.saldoResiduo.toFixed(2)}`); } }
-    function mostraStorico(id) { const a=appsBuoni.find(a=>a.id===id); if(!a) return; const s=storicoSpese[id]||[], modal=document.getElementById('storico-modal'), lista=document.getElementById('storico-lista'); if(!s.length) lista.innerHTML='<p>Nessuna spesa registrata</p>'; else lista.innerHTML=`<ul>${s.map(sp=>`<li><strong>${sp.data}</strong><br>💸 €${sp.importo.toFixed(2)} - ${escapeHtml(sp.descrizione)}</li>`).join('')}</ul><p>Totale speso: €${a.speseTotali.toFixed(2)}<br>Residuo: €${(a.saldoResiduo||0).toFixed(2)}</p>`; modal.classList.add('active'); }
+    // BUONI PASTO
+    function salvaBuono() {
+      const nome = document.getElementById('buono-nome').value.trim();
+      const saldoStr = document.getElementById('buono-saldo-iniziale').value;
+      const codice = document.getElementById('buono-codice').value.trim();
+      if(!nome){ showToast('Inserisci il nome del buono'); return; }
+      const saldo = saldoStr !== '' ? parseFloat(saldoStr) : null;
+      buoni.push({ id: Date.now(), nome, codice: codice || null, saldoIniziale: saldo, saldoResiduo: saldo, speseTotali: 0, dataCreazione: new Date().toISOString() });
+      document.getElementById('buono-nome').value = '';
+      document.getElementById('buono-saldo-iniziale').value = '';
+      document.getElementById('buono-codice').value = '';
+      renderBuoni(); salvaDatiFamiglia(); showToast(`✓ Buono "${nome}" aggiunto`);
+    }
+    function impostaSaldoBuono(id) {
+      const b = buoni.find(b => b.id===id); if(!b) return;
+      const s = prompt(`Imposta nuovo saldo per "${b.nome}" (€):`, b.saldoResiduo !== null ? b.saldoResiduo : '');
+      if(s !== null && s !== '' && !isNaN(parseFloat(s))){
+        const val = parseFloat(s);
+        if(b.saldoIniziale === null) b.saldoIniziale = val;
+        b.saldoResiduo = val;
+        renderBuoni(); salvaDatiFamiglia(); showToast(`✓ Saldo aggiornato: €${val.toFixed(2)}`);
+      }
+    }
+    function usaBuono(id) {
+      const b = buoni.find(b => b.id===id); if(!b) return;
+      if(b.saldoResiduo === null){ showToast('Prima imposta il saldo'); return; }
+      const v = prompt(`Importo speso con "${b.nome}" (€):`, '');
+      if(v !== null && v !== '' && !isNaN(parseFloat(v))){
+        const sp = parseFloat(v);
+        if(sp <= 0){ showToast('Importo non valido'); return; }
+        if(sp > b.saldoResiduo){ showToast(`Saldo insufficiente! Residuo: €${b.saldoResiduo.toFixed(2)}`); return; }
+        const desc = prompt('Descrizione (opzionale):', 'Acquisto') || 'Acquisto';
+        b.saldoResiduo = Math.max(0, b.saldoResiduo - sp);
+        b.speseTotali = (b.speseTotali || 0) + sp;
+        if(!storicoSpese[id]) storicoSpese[id] = [];
+        storicoSpese[id].push({ data: new Date().toLocaleString('it-IT'), importo: sp, descrizione: desc });
+        renderBuoni(); salvaDatiFamiglia();
+        showToast(`💸 €${sp.toFixed(2)} scalati — Residuo: €${b.saldoResiduo.toFixed(2)}`);
+      }
+    }
+    function mostraStorico(id) {
+      const b = buoni.find(b => b.id===id); if(!b) return;
+      const storico = storicoSpese[id] || [];
+      document.getElementById('storico-modal-titolo').textContent = `📋 Storico — ${b.nome}`;
+      document.getElementById('storico-riepilogo-box').innerHTML = `
+        <div class="storico-riepilogo">
+          <div><div class="label">Saldo iniziale</div><div class="valore">€${(b.saldoIniziale||0).toFixed(2)}</div></div>
+          <div><div class="label">Speso</div><div class="valore" style="color:#E63946">€${(b.speseTotali||0).toFixed(2)}</div></div>
+          <div><div class="label">Residuo</div><div class="valore">€${(b.saldoResiduo||0).toFixed(2)}</div></div>
+        </div>`;
+      const lista = document.getElementById('storico-lista');
+      if(!storico.length){ lista.innerHTML = '<p style="color:#aaa;text-align:center;padding:16px 0">Nessuna spesa registrata</p>'; }
+      else { lista.innerHTML = [...storico].reverse().map(sp => `<div class="storico-item"><div><div class="storico-desc">${escapeHtml(sp.descrizione)}</div><div class="storico-data">${sp.data}</div></div><div class="storico-importo">−€${Number(sp.importo).toFixed(2)}</div></div>`).join(''); }
+      document.getElementById('storico-modal').classList.add('active');
+    }
     function chiudiStorico() { document.getElementById('storico-modal').classList.remove('active'); }
-    function eliminaAppBuono(id) { if(confirm('Eliminare questa app?')){ appsBuoni=appsBuoni.filter(a=>a.id!==id); delete storicoSpese[id]; renderAppsBuoni(); salvaDatiFamiglia(); showToast('✓ App eliminata'); } }
-    function togglePasswordVisibility(id) { const s=document.getElementById(`password-${id}`); if(s) s.style.display=s.style.display==='none'?'inline':'none'; }
-    function apriLink(l) { if(l) window.open(l,'_blank'); else showToast('Nessun link'); }
-    function renderAppsBuoni() { const c=document.getElementById('lista-app'); if(!appsBuoni.length){ c.innerHTML='<p style="text-align:center;color:#aaa;padding:20px">Nessuna app salvata</p>'; return; } c.innerHTML=appsBuoni.map(a=>{ const d=getDecodedPassword(a.password), m='•'.repeat(Math.min(d.length,8)); return `<div class="app-buono-card"><div class="app-info"><div class="app-nome">${escapeHtml(a.nome)}</div><div class="app-crediti">👤 ${escapeHtml(a.username)}<br>🔒 ${m}<button class="mostra-password" onclick="togglePasswordVisibility(${a.id})">👁️</button><span id="password-${a.id}" style="display:none;"> (${d})</span></div><div class="app-saldo">💰 Saldo: ${a.saldoResiduo!==null?`€${a.saldoResiduo.toFixed(2)}`:'Non impostato'}</div>${a.speseTotali>0?`<div class="app-spese">📉 Speso: €${a.speseTotali.toFixed(2)}</div>`:''}</div><div class="app-azioni">${a.link?`<button class="btn-apri-app" onclick="apriLink('${a.link}')">🌐 Apri sito</button>`:''}<button class="btn-saldo-iniziale" onclick="impostaSaldoIniziale(${a.id})">💰 Imposta</button><button class="btn-usa-buono" onclick="registraSpesa(${a.id})">💸 Usa</button><button class="btn-storico" onclick="mostraStorico(${a.id})">📋 Storico</button><button class="btn-elimina-carta" onclick="eliminaAppBuono(${a.id})">✕</button></div></div>`; }).join(''); }
-    
-    // BUONI FISICI
-    function salvaBuono() { const n=document.getElementById('buono-nome').value.trim(), c=document.getElementById('buono-codice').value.trim(); if(!n||!c){ showToast('Inserisci nome e codice'); return; } buoni.push({id:Date.now(), nome:n, codice:c}); document.getElementById('buono-nome').value=''; document.getElementById('buono-codice').value=''; renderBuoni(); salvaDatiFamiglia(); showToast(`✓ Buono ${n} salvato`); }
-    function eliminaBuono(id) { buoni=buoni.filter(b=>b.id!==id); renderBuoni(); salvaDatiFamiglia(); showToast('✓ Buono eliminato'); }
-    function renderBuoni() { const c=document.getElementById('lista-buoni'); if(!buoni.length){ c.innerHTML='<p style="text-align:center;color:#aaa;padding:20px">Nessun buono salvato</p>'; return; } c.innerHTML=buoni.map(b=>`<div class="carta"><div class="carta-info"><div class="carta-nome">${escapeHtml(b.nome)}</div><div class="carta-codice">${b.codice}</div></div><div class="carta-azioni"><button class="btn-mostra" onclick="mostraModale('${escapeHtml(b.nome)}','${b.codice}')">Mostra</button><button class="btn-elimina-carta" onclick="eliminaBuono(${b.id})">✕</button></div></div>`).join(''); }
+    function eliminaBuono(id) {
+      if(!confirm('Eliminare questo buono pasto e tutto il suo storico?')) return;
+      buoni = buoni.filter(b => b.id!==id); delete storicoSpese[id];
+      renderBuoni(); salvaDatiFamiglia(); showToast('✓ Buono eliminato');
+    }
+    function renderBuoni() {
+      const c = document.getElementById('lista-buoni');
+      if(!buoni.length){ c.innerHTML='<div class="vuota" style="padding:32px 0">🍽️ Nessun buono pasto salvato</div>'; return; }
+      c.innerHTML = buoni.map(b => {
+        const saldoR = b.saldoResiduo, saldoI = b.saldoIniziale;
+        const perc = (saldoI && saldoI > 0 && saldoR !== null) ? Math.max(0, Math.min(100, (saldoR/saldoI)*100)) : null;
+        const basso = saldoR !== null && saldoI && saldoR < saldoI * 0.25;
+        const esaurito = saldoR !== null && saldoR <= 0;
+        const stato = esaurito ? 'esaurito' : basso ? 'basso' : '';
+        const saldoTxt = saldoR !== null ? `€${saldoR.toFixed(2)}` : 'Saldo non impostato';
+        const numSpese = (storicoSpese[b.id] || []).length;
+        return `<div class="buono-card">
+          <div class="buono-header"><div class="buono-nome">🍽️ ${escapeHtml(b.nome)}</div><div class="buono-saldo-badge ${stato}">${saldoTxt}</div></div>
+          ${perc !== null ? `<div class="buono-progressbar-wrap"><div class="buono-progressbar ${stato}" style="width:${perc}%"></div></div>` : ''}
+          <div class="buono-stats">
+            ${saldoI !== null ? `<span>Iniziale: <strong>€${saldoI.toFixed(2)}</strong></span>` : ''}
+            ${b.speseTotali > 0 ? `<span>Speso: <strong>€${b.speseTotali.toFixed(2)}</strong></span>` : ''}
+            ${numSpese > 0 ? `<span>${numSpese} transazion${numSpese===1?'e':'i'}</span>` : ''}
+          </div>
+          <div class="buono-azioni">
+            <button class="btn-b-imposta" onclick="impostaSaldoBuono(${b.id})">💰 Imposta saldo</button>
+            <button class="btn-b-usa" onclick="usaBuono(${b.id})">💸 Usa buono</button>
+            ${numSpese > 0 ? `<button class="btn-b-storico" onclick="mostraStorico(${b.id})">📋 Storico</button>` : ''}
+            ${b.codice ? `<button class="btn-mostra" style="font-size:0.7rem;padding:7px 12px" onclick="mostraModale('${escapeHtml(b.nome)}','${b.codice}')">🔲 Barcode</button>` : ''}
+            <button class="btn-b-elimina" onclick="eliminaBuono(${b.id})">✕</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
     
     // STATISTICHE
     let chart = null;
@@ -782,27 +888,39 @@
       const i=document.getElementById('campo-barcode'), cod=i.value.trim(); 
       if(!cod) return; 
       const r=document.getElementById('risultato-barcode'); 
-      r.textContent='🔍 Ricerca...'; 
+      r.innerHTML='<div class="prodotto-trovato-loading">🔍 Ricerca in corso...</div>';
+      prodottoTrovato = null;
       try{ 
         const res=await fetch(`https://world.openfoodfacts.org/api/v0/product/${cod}.json`); 
         const data=await res.json(); 
         if(data.status===1){ 
-          const nome=data.product.product_name_it||data.product.product_name||data.product.brands||'Prodotto'; 
-          r.textContent=`✓ Trovato: ${nome}`; 
-          document.getElementById('campo-input').value = nome;
-          showToast(`✓ Prodotto trovato! Inserisci prezzo e quantità`); 
+          const prod = data.product;
+          const nome = prod.product_name_it || prod.product_name || prod.abbreviated_product_name || '';
+          const marca = prod.brands || prod.brand_owner || '';
+          const foto = prod.image_front_small_url || prod.image_small_url || prod.image_url || '';
+          const categoria = prod.categories_tags ? prod.categories_tags[0]?.replace('en:','').replace(/-/g,' ') : '';
+          prodottoTrovato = { nome, marca, foto };
+          if(nome) document.getElementById('campo-input').value = nome;
+          r.innerHTML = `<div class="prodotto-trovato">
+            ${foto ? `<img src="${escapeHtml(foto)}" alt="${escapeHtml(nome)}" onerror="this.style.display='none'">` : ''}
+            <div class="prodotto-dettagli">
+              <div class="prodotto-nome-trovato">✅ ${escapeHtml(nome || 'Prodotto trovato')}</div>
+              ${marca ? `<div class="prodotto-marca">🏷️ ${escapeHtml(marca)}</div>` : ''}
+              ${categoria ? `<div class="prodotto-categoria">📂 ${escapeHtml(categoria)}</div>` : ''}
+            </div>
+          </div>`;
+          showToast('✓ Prodotto trovato! Aggiungi prezzo e quantità'); 
         } else { 
-          r.className='risultato-barcode errore'; 
-          r.textContent='✕ Prodotto non trovato. Inserisci manualmente'; 
+          prodottoTrovato = null;
+          r.innerHTML='<div class="prodotto-trovato-errore">✕ Prodotto non trovato. Inserisci manualmente.</div>';
           showToast('✕ Prodotto non trovato'); 
         } 
-      } catch(e){ r.className='risultato-barcode errore'; r.textContent='✕ Errore di connessione'; showToast('✕ Errore di connessione'); } 
+      } catch(e){ r.innerHTML='<div class="prodotto-trovato-errore">✕ Errore di connessione.</div>'; showToast('✕ Errore di connessione'); } 
     }
     
     function mostraModale(n,c) { document.getElementById('modale-nome').textContent=n; document.getElementById('modale-codice').textContent=c; JsBarcode('#modale-barcode',c,{format:'CODE128',width:2,height:80,displayValue:false}); document.getElementById('modale').classList.add('aperta'); }
     function chiudiModale() { document.getElementById('modale').classList.remove('aperta'); }
     
-    document.getElementById('app-seleziona')?.addEventListener('change',function(){ const p=document.getElementById('app-nome-personalizzato'); p.style.display=this.value==='Altra'?'block':'none'; const opt=this.options[this.selectedIndex]; document.getElementById('app-link').value=opt.getAttribute('data-link')||''; });
     document.getElementById('campo-input')?.addEventListener('keydown',e=>e.key==='Enter'&&aggiungiProdotto());
     document.getElementById('campo-barcode')?.addEventListener('keydown',e=>e.key==='Enter'&&cercaBarcode());
     if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(e=>console.log('SW error:',e));
@@ -811,16 +929,16 @@
     window.avviaFotocamera=avviaFotocamera; window.stopFotocamera=stopFotocamera; window.cercaBarcode=cercaBarcode;
     window.aggiungiProdotto=aggiungiProdotto; window.toggleFatto=toggleFatto; window.cambiaQuantita=cambiaQuantita;
     window.eliminaProdotto=eliminaProdotto; window.pulisciCompletati=pulisciCompletati; window.setFiltro=setFiltro;
-    window.salvaCarta=salvaCarta; window.eliminaCarta=eliminaCarta; window.salvaBuono=salvaBuono; window.eliminaBuono=eliminaBuono;
-    window.salvaAppBuono=salvaAppBuono; window.eliminaAppBuono=eliminaAppBuono; window.impostaSaldoIniziale=impostaSaldoIniziale;
-    window.registraSpesa=registraSpesa; window.mostraStorico=mostraStorico; window.chiudiStorico=chiudiStorico;
-    window.apriLink=apriLink; window.togglePasswordVisibility=togglePasswordVisibility; window.mostraModale=mostraModale;
-    window.chiudiModale=chiudiModale; window.vaiA=vaiA; window.accediFamiglia=accediFamiglia; window.creaNuovaFamiglia=creaNuovaFamiglia;
+    window.salvaCarta=salvaCarta; window.eliminaCarta=eliminaCarta;
+    window.salvaBuono=salvaBuono; window.eliminaBuono=eliminaBuono; window.usaBuono=usaBuono;
+    window.impostaSaldoBuono=impostaSaldoBuono; window.mostraStorico=mostraStorico; window.chiudiStorico=chiudiStorico;
+    window.mostraModale=mostraModale; window.chiudiModale=chiudiModale;
+    window.vaiA=vaiA; window.accediFamiglia=accediFamiglia; window.creaNuovaFamiglia=creaNuovaFamiglia;
     window.mostraCreaFamiglia=mostraCreaFamiglia; window.nascondiCreaFamiglia=nascondiCreaFamiglia; window.copiaCodice=copiaCodice;
     window.skipTutorial=skipTutorial; window.nextTutorial=nextTutorial; window.mostraStatistiche=mostraStatistiche;
     window.chiudiStats=chiudiStats; window.cambiaPeriodo=cambiaPeriodo;
     
-    renderLista(); aggiornaContatori(); renderCarte(); renderBuoni(); renderAppsBuoni(); calcolaTotaleSpesa();
+    renderLista(); aggiornaContatori(); renderCarte(); renderBuoni(); calcolaTotaleSpesa();
   </script>
 </body>
 </html>
