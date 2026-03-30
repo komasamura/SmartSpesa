@@ -443,7 +443,6 @@
     let db = null;
     let currentFamilyCode = null;
     let currentFamilyName = null;
-    let ignoreSync = false;
     let isOnline = navigator.onLine;
     
     try {
@@ -479,8 +478,10 @@
     window.addEventListener('online', () => { 
       isOnline = true; 
       document.getElementById('offline-status').innerHTML = ''; 
-      document.getElementById('sync-status').innerHTML = '✅ Sincronizzato con il cloud'; 
-      if(currentFamilyCode) salvaDatiFamiglia(); 
+      if(currentFamilyCode) {
+        salvaDatiFamiglia();
+        document.getElementById('sync-status').innerHTML = '✅ Sincronizzato con il cloud';
+      }
     });
     window.addEventListener('offline', () => { 
       isOnline = false; 
@@ -554,23 +555,48 @@
     
     function caricaDatiFamiglia() {
       if(!db || !currentFamilyCode) return;
+      caricaCacheLocale();
       const r = db.ref('famiglie/' + currentFamilyCode);
-      r.child('prodotti').on('value', s => { if(!ignoreSync){ prodotti = s.val() || []; renderLista(); aggiornaContatori(); calcolaTotaleSpesa(); } });
-      r.child('carte').on('value', s => { if(!ignoreSync){ carte = s.val() || []; renderCarte(); } });
-      r.child('buoni').on('value', s => { if(!ignoreSync){ buoni = s.val() || []; renderBuoni(); } });
-      r.child('storicoSpese').on('value', s => { if(!ignoreSync){ storicoSpese = s.val() || {}; } });
+      r.child('prodotti').on('value', s => { prodotti = s.val() || []; salvaCacheLocale(); renderLista(); aggiornaContatori(); calcolaTotaleSpesa(); });
+      r.child('carte').on('value', s => { carte = s.val() || []; salvaCacheLocale(); renderCarte(); });
+      r.child('buoni').on('value', s => { buoni = s.val() || []; salvaCacheLocale(); renderBuoni(); });
+      r.child('storicoSpese').on('value', s => { storicoSpese = s.val() || {}; salvaCacheLocale(); });
       document.getElementById('sync-status').innerHTML = isOnline ? '✅ Sincronizzato con il cloud' : '⚠️ Offline - modifiche salvate localmente';
     }
-    
+
+    function salvaCacheLocale() {
+      if(!currentFamilyCode) return;
+      localStorage.setItem('cache_' + currentFamilyCode, JSON.stringify({ prodotti, carte, buoni, storicoSpese }));
+    }
+
+    function caricaCacheLocale() {
+      if(!currentFamilyCode) return;
+      const cache = localStorage.getItem('cache_' + currentFamilyCode);
+      if(cache) {
+        try {
+          const d = JSON.parse(cache);
+          prodotti = d.prodotti || [];
+          carte = d.carte || [];
+          buoni = d.buoni || [];
+          storicoSpese = d.storicoSpese || {};
+          renderLista(); aggiornaContatori(); calcolaTotaleSpesa(); renderCarte(); renderBuoni();
+        } catch(e) { console.log('Cache locale non valida'); }
+      }
+    }
+
     function salvaDatiFamiglia() {
-      if(!db || !currentFamilyCode || !isOnline) return;
-      ignoreSync = true;
+      if(!db || !currentFamilyCode) return;
+      salvaCacheLocale();
+      if(!isOnline) {
+        document.getElementById('sync-status').innerHTML = '⚠️ Offline - modifiche salvate localmente';
+        return;
+      }
       const r = db.ref('famiglie/' + currentFamilyCode);
       r.child('prodotti').set(prodotti);
       r.child('carte').set(carte);
       r.child('buoni').set(buoni);
       r.child('storicoSpese').set(storicoSpese);
-      setTimeout(() => ignoreSync = false, 500);
+      document.getElementById('sync-status').innerHTML = '✅ Sincronizzato con il cloud';
     }
     
     // VERIFICA FAMIGLIA SALVATA
