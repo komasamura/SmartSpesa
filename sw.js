@@ -1,5 +1,5 @@
 // ⬇️ CAMBIA QUESTO NUMERO AD OGNI AGGIORNAMENTO (v1, v2, v3...)
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const CACHE_NAME = 'smartspesa-' + CACHE_VERSION;
 
 const urlsToCache = [
